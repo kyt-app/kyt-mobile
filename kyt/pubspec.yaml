@@ -1,0 +1,37 @@
+name: kyt
+description: Know your traveller.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/icons/
+
+  fonts:
+    - family: airbnb
+      fonts:
+        - asset: assets/fonts/airbnb-regular.ttf
+        - asset: assets/fonts/airbnb-bold.ttf
+          weight: 800
+
+    - family: lexenddeca
+      fonts:
+        - asset: assets/fonts/lexenddeca.ttf
