@@ -6,10 +6,12 @@ class MyStrings {
   // auth region starts
   static const joinKytLabel = "Join KYT";
   static const loginLabel = "Login";
+  static const signupLabel = "Signup";
   static const or = "or";
   static const createNewAccountLabel = "Create new account";
 
   static const loginToKYT = "Login to KYT";
+  static const signupForKYT = "Signup for KYT";
   static const emailAddressLabel = "Email address";
   static const passwordLabel = "Password";
   static const noAccountLabel = "Don't have an account yet?";
