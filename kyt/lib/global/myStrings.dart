@@ -33,9 +33,8 @@ class MyStrings {
   static const travellerLabel = "Traveller";
   static const sampleName = "Sayam Kanwar";
   static const verificationLabel = "Verification";
-  static const test1Label1 = "Test 1";
-  static const test1Label2 = "Test 2";
-  static const test1Label3 = "Test 3";
-  static const test1Label4 = "Test 4";
-  static const test1Label5 = "Test 5";
+  static const test1Label = "Covid Vaccine";
+  static const test2Label = "Covid Test";
+  static const test3Label = "Test 3";
+  static const test4Label = "Test 4";
 }

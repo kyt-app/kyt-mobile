@@ -12,7 +12,7 @@ class DatabaseService {
     return await usersCollection.document(uid).setData({
       'phoneNumber': phoneNumber,
       'name': name,
-      'aadharCardNumber': aadharCardNumber
+      'aadharNo': aadharCardNumber
     });
   }
 }

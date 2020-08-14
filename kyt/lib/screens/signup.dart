@@ -8,9 +8,11 @@ import 'package:kyt/widgets/authTextField.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:kyt/screens/home.dart';
+import 'package:kyt/functions/getAadhar.dart' as getAadhar;
 
 class Signup extends StatefulWidget {
   static String id = "signup";
+
   @override
   _SignupState createState() => _SignupState();
 }
@@ -72,6 +74,8 @@ class _SignupState extends State<Signup> {
                               maxLength: 12,
                               onChanged: (value) {
                                 userAadhar = value;
+                                var Aadhar = getAadhar.GetAadhar();
+                                Aadhar.setAadhar(userAadhar);
                               },
                               password: false,
                               hint: MyStrings.aadharNumberLabel,
@@ -111,6 +115,7 @@ class _SignupState extends State<Signup> {
                                       .createUserWithEmailAndPassword(
                                           email: userEmail,
                                           password: userPassword);
+
                                   //create a new document for the user
                                   await DatabaseService(uid: userAadhar)
                                       .updateUserData(userName, userPhoneNumber,
