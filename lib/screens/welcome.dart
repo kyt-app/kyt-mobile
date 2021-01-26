@@ -3,7 +3,7 @@ import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/global/myStrings.dart';
 import 'package:kyt/screens/login.dart';
-import 'package:kyt/screens/signup.dart';
+import 'package:kyt/screens/register.dart';
 
 class Welcome extends StatefulWidget {
   static String id = "welcome";
@@ -95,7 +95,7 @@ class _WelcomeState extends State<Welcome> {
                         minWidth: MediaQuery.of(context).size.width,
                         child: RaisedButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, Signup.id);
+                            Navigator.pushNamed(context, Register.id);
                           },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),

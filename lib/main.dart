@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
-import 'screens/signup.dart';
+import 'screens/register.dart';
 import 'screens/welcome.dart';
 import 'screens/verification/1.dart';
 import 'screens/verification/2.dart';
@@ -21,7 +21,7 @@ class Kyt extends StatelessWidget {
       routes: {
         Home.id: (context) => Home(),
         Login.id: (context) => Login(),
-        Signup.id: (context) => Signup(),
+        Register.id: (context) => Register(),
         Welcome.id: (context) => Welcome(),
         Verification1.id: (context) => Verification1(),
         Verification2.id: (context) => Verification2(),

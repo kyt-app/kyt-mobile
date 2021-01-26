@@ -1,4 +1,4 @@
-package com.example.kyt;
+package co.techsyndicate.kyt;
 
 import io.flutter.embedding.android.FlutterActivity;
 

@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "79208548068",
-    "firebase_url": "https://knowyourtraveller.firebaseio.com",
-    "project_id": "knowyourtraveller",
-    "storage_bucket": "knowyourtraveller.appspot.com"
+    "project_number": "35559841846",
+    "project_id": "kyt-app",
+    "storage_bucket": "kyt-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:79208548068:android:20598daeed400f40e64ef1",
+        "mobilesdk_app_id": "1:35559841846:android:2a6a2c30c43bf030e9f897",
         "android_client_info": {
-          "package_name": "com.example.kyt"
+          "package_name": "co.techsyndicate.kyt"
         }
       },
       "oauth_client": [
         {
-          "client_id": "79208548068-qjctqnp2bgupm1km1f2ndvgd11jq6mbj.apps.googleusercontent.com",
+          "client_id": "35559841846-jm3kpb4iloihhke8n357vl0b3sf1h7vj.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAgxRSrOyyJGocDbaSX6cASBF1V7LGzPqA"
+          "current_key": "AIzaSyDBiMghyejS9B9UE_qS2hhyVloailwxkpc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "79208548068-qjctqnp2bgupm1km1f2ndvgd11jq6mbj.apps.googleusercontent.com",
+              "client_id": "35559841846-jm3kpb4iloihhke8n357vl0b3sf1h7vj.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

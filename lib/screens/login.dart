@@ -3,7 +3,7 @@ import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/global/myStrings.dart';
 import 'package:kyt/screens/home.dart';
-import 'package:kyt/screens/signup.dart';
+import 'package:kyt/screens/register.dart';
 import 'package:kyt/widgets/authTextField.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -107,10 +107,10 @@ class _LoginState extends State<Login> {
                           Text(" "),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(context, Signup.id);
+                              Navigator.pushNamed(context, Register.id);
                             },
                             child: Text(
-                              MyStrings.signupLabel + ".",
+                              MyStrings.registerLabel + ".",
                               style: Theme.of(context)
                                   .textTheme
                                   .subtitle1
