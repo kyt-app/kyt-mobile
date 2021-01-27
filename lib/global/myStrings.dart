@@ -14,6 +14,7 @@ class MyStrings {
   static const registerForKYT = "Register for KYT";
   static const emailAddressLabel = "Email address";
   static const passwordLabel = "Password";
+  static const passportLabel = "Passport number";
   static const noAccountLabel = "Don't have an account yet?";
 
   static const nameLabel = "Name";
@@ -24,9 +25,12 @@ class MyStrings {
   // auth region ends
 
   // auth error starts
-  static const emailError = "Invalid email";
+  static const emailError = "Invalid email address entered.";
+  static const passwordRequiredError = "Password is required.";
   static const passwordLengthError = "Password too short.";
   static const passwordMismatchError = "Passwords do not match";
+  static const phoneNumberError = "Phone number is required.";
+  static const passportNumberError = "Invalid passport number entered.";
   // auth error ends
 
   // home starts
