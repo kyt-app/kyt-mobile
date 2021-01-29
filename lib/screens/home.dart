@@ -19,7 +19,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   void getCurrentUserId() async {
     final auth = FirebaseAuth.instance;
-    final FirebaseUser user = await auth.currentUser();
+    final user = auth.currentUser;
     final uid = user.uid;
     print(uid);
   }
