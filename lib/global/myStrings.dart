@@ -9,6 +9,8 @@ class MyStrings {
   static const registerLabel = "Register";
   static const or = "or";
   static const createNewAccountLabel = "Create new account";
+  static const loggingInLabel = "Logging in";
+  static const registeringLabel = "Registering";
 
   static const loginToKYT = "Login to KYT";
   static const registerForKYT = "Register for KYT";
@@ -25,6 +27,8 @@ class MyStrings {
   // auth region ends
 
   // auth error starts
+  static const userNotFoundError = "User not found.";
+  static const incorrectPasswordError = "Incorrect Password";
   static const emailError = "Invalid email address entered.";
   static const passwordRequiredError = "Password is required.";
   static const passwordLengthError = "Password too short.";

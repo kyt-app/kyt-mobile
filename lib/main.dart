@@ -34,6 +34,7 @@ class Kyt extends StatelessWidget {
             theme: ThemeData(fontFamily: "lexenddeca"),
             initialRoute: Welcome.id,
             routes: {
+              Home.id: (context) => Home(),
               Login.id: (context) => Login(),
               Register.id: (context) => Register(),
               Welcome.id: (context) => Welcome(),

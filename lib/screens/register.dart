@@ -226,8 +226,10 @@ class _RegisterState extends State<Register> {
                                   _formKey.currentState.save();
 
                                   if (_formKey.currentState.validate()) {
-                                    print("Regisering user");
-                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text('Registering ' + userName)));
+                                    FocusScope.of(context).unfocus();
+
+                                    print(MyStrings.registeringLabel);
+                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.registeringLabel + userName)));
 
                                     // firebase auth
                                     final newUser = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);

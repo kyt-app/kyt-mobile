@@ -19,9 +19,8 @@ class VerificationCard extends StatelessWidget {
           Navigator.pushNamed(context, route);
         },
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            side: BorderSide(color: MyColors.darkPrimary, width: 1)),
-        color: MyColors.white,
+            borderRadius: BorderRadius.circular(8.0),),
+        color: MyColors.offWhite,
         padding: EdgeInsets.all(18),
         child: Container(
           child: Row(
