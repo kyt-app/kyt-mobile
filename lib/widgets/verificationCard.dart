@@ -5,9 +5,8 @@ import 'package:kyt/global/myColors.dart';
 
 class VerificationCard extends StatelessWidget {
   final String text;
-  final String route;
   final bool iconBool;
-  VerificationCard({this.text, this.route, this.iconBool});
+  VerificationCard({this.text, this.iconBool});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +14,6 @@ class VerificationCard extends StatelessWidget {
       minWidth: MediaQuery.of(context).size.width,
       child: RaisedButton(
         elevation: 5,
-        onPressed: () {
-          Navigator.pushNamed(context, route);
-        },
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),),
         color: MyColors.offWhite,
@@ -37,7 +33,7 @@ class VerificationCard extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: Expanded(
-                    child: iconBool == true
+                    child: iconBool
                         ? Icon(Icons.check, color: MyColors.green)
                         : Icon(Icons.clear, color: Colors.red)),
               ),
