@@ -63,7 +63,7 @@ class _RegisterState extends State<Register> {
                                       .headline6
                                       .copyWith(color: Colors.grey[800]),
                                   hintText: MyStrings.nameLabel,
-                                  fillColor: Colors.white54,
+                                  fillColor: MyColors.offWhite,
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
                                   ),
@@ -83,7 +83,7 @@ class _RegisterState extends State<Register> {
                                       .headline6
                                       .copyWith(color: Colors.grey[800]),
                                   hintText: MyStrings.emailAddressLabel,
-                                  fillColor: Colors.white54,
+                                  fillColor: MyColors.offWhite,
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
                                   ),
@@ -111,7 +111,7 @@ class _RegisterState extends State<Register> {
                                       .headline6
                                       .copyWith(color: Colors.grey[800]),
                                   hintText: MyStrings.phoneNumberLabel,
-                                  fillColor: Colors.white54,
+                                  fillColor: MyColors.offWhite,
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
                                   ),
@@ -152,7 +152,7 @@ class _RegisterState extends State<Register> {
                                       .headline6
                                       .copyWith(color: Colors.grey[800]),
                                   hintText: MyStrings.passportLabel,
-                                  fillColor: Colors.white54,
+                                  fillColor: MyColors.offWhite,
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
                                   ),
@@ -189,7 +189,7 @@ class _RegisterState extends State<Register> {
                                       .headline6
                                       .copyWith(color: Colors.grey[800]),
                                   hintText: MyStrings.passwordLabel,
-                                  fillColor: Colors.white54,
+                                  fillColor: MyColors.offWhite,
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
                                   ),

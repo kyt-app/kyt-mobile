@@ -29,6 +29,7 @@ class MyStrings {
   // auth error starts
   static const userNotFoundError = "User not found.";
   static const incorrectPasswordError = "Incorrect Password";
+  static const somethingWentWrongError = "Something went wrong";
   static const emailError = "Invalid email address entered.";
   static const passwordRequiredError = "Password is required.";
   static const passwordLengthError = "Password too short.";

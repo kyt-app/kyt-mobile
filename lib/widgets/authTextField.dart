@@ -32,7 +32,7 @@ class AuthTextField extends StatelessWidget {
             .headline6
             .copyWith(color: Colors.grey[800]),
         hintText: hint,
-        fillColor: Colors.white54,
+        fillColor: MyColors.offWhite,
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
         ),

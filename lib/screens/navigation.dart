@@ -12,14 +12,14 @@ import 'package:http/http.dart' as http;
 import 'package:kyt/screens/home.dart';
 import 'package:kyt/screens/settings.dart';
 
-class Upload extends StatefulWidget {
-  static String id = "upload";
+class Navigation extends StatefulWidget {
+  static String id = "navigation";
 
   @override
-  _UploadState createState() => _UploadState();
+  _NavigationState createState() => _NavigationState();
 }
 
-class _UploadState extends State<Upload> {
+class _NavigationState extends State<Navigation> {
   final _auth = FirebaseAuth.instance;
   String imagePath, testName;
   bool validTest;
@@ -86,7 +86,6 @@ class _UploadState extends State<Upload> {
     return Scaffold(
       backgroundColor: MyColors.offWhite,
       body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 30),
       child: _currentPage[pageIndex],
       //   child: Center(
 
@@ -172,7 +171,7 @@ class _UploadState extends State<Upload> {
                                       .headline6
                                       .copyWith(color: Colors.grey[800]),
                                   hintText: 'Test name',
-                                  fillColor: Colors.white54,
+                                  fillColor: MyColors.offWhite,
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: MyColors.darkGrey, width: 1.0),
                                   ),

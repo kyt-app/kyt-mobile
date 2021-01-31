@@ -4,7 +4,7 @@ import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/global/myStrings.dart';
 import 'package:kyt/screens/home.dart';
 import 'package:kyt/screens/register.dart';
-import 'package:kyt/screens/upload.dart';
+import 'package:kyt/screens/navigation.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -61,7 +61,7 @@ class _LoginState extends State<Login> {
                                     .headline6
                                     .copyWith(color: Colors.grey[800]),
                                 hintText: MyStrings.emailAddressLabel,
-                                fillColor: Colors.white54,
+                                fillColor: MyColors.offWhite,
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
                                 ),
@@ -92,7 +92,7 @@ class _LoginState extends State<Login> {
                                         .headline6
                                         .copyWith(color: Colors.grey[800]),
                                     hintText: MyStrings.passwordLabel,
-                                    fillColor: Colors.white54,
+                                    fillColor: MyColors.offWhite,
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
                                     ),
@@ -133,7 +133,7 @@ class _LoginState extends State<Login> {
                                         Scaffold.of(context).showSnackBar(SnackBar(
                                             content: Text(
                                                 MyStrings.loggingInLabel)));
-                                        Navigator.pushNamed(context, Upload.id);
+                                        Navigator.pushNamed(context, Navigation.id);
                                       } else {
                                         Scaffold.of(context).showSnackBar(
                                             SnackBar(content: Text(
@@ -145,7 +145,7 @@ class _LoginState extends State<Login> {
                                     }
                                   } catch (e) {
                                     print(e);
-                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.passportNumberError)));
+                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.somethingWentWrongError)));
                                     setState(() {
                                       showSpinner = false;
                                     });

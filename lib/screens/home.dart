@@ -53,6 +53,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: true,
       backgroundColor: MyColors.offWhite,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,55 +63,62 @@ class _HomeState extends State<Home> {
           Column(
             children: <Widget>[
               Container(
-                margin: EdgeInsets.symmetric(vertical: MyDimens.double_100),
+                color: MyColors.darkPrimary,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height*0.3,
+                padding: EdgeInsets.all(MyDimens.double_50),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        image: NetworkImage('https://github.com/rchtgpt.png'),
+                    ),
+                  ),
+                ),
+
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: MyDimens.double_30, vertical: MyDimens.double_15),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          MyStrings.sampleName + "'s Healthcare Records",
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline5
-                              .copyWith(
-                              color: MyColors.darkPrimary,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        MySpaces.vLargeGapInBetween,
-                        Column(
-                          children: <Widget>[
-                            VerificationCard(
-                              iconBool: true,
-                              route: Verification1.id,
-                              text: MyStrings.test1Label,
-                            ),
-                            MySpaces.vSmallGapInBetween,
-                            VerificationCard(
-                              iconBool: false,
-                              route: Verification2.id,
-                              text: MyStrings.test2Label,
-                            ),
-                            MySpaces.vSmallGapInBetween,
-                            VerificationCard(
-                              iconBool: false,
-                              route: Verification3.id,
-                              text: MyStrings.test3Label,
-                            ),
-                            MySpaces.vSmallGapInBetween,
-                            VerificationCard(
-                              iconBool: false,
-                              route: Verification3.id,
-                              text: MyStrings.test3Label,
-                            ),
-                            MySpaces.vSmallGapInBetween,
-                          ],
-                        ),
-                      ],
+                    Text(
+                      MyStrings.sampleName + "'s Healthcare Records",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline5
+                          .copyWith(
+                          color: MyColors.darkPrimary,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    MySpaces.vLargeGapInBetween,
+                    Container(
+                      child: Column(
+                        children: [
+                          VerificationCard(
+                            iconBool: true,
+                            route: Verification1.id,
+                            text: MyStrings.test1Label,
+                          ),
+                          MySpaces.vSmallGapInBetween,
+                          VerificationCard(
+                            iconBool: false,
+                            route: Verification2.id,
+                            text: MyStrings.test2Label,
+                          ),
+                          MySpaces.vSmallGapInBetween,
+                          VerificationCard(
+                            iconBool: false,
+                            route: Verification3.id,
+                            text: MyStrings.test3Label,
+                          ),
+                          MySpaces.vSmallGapInBetween,
+                        ],
+                      ),
                     )
                   ],
                 ),
-              ),
+              )
             ],
           )
         ],
