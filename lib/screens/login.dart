@@ -23,7 +23,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.offWhite,
       body: Builder(
         builder: (context) => ModalProgressHUD(
@@ -38,7 +38,8 @@ class _LoginState extends State<Login> {
                   Text(
                     MyStrings.loginToKYT,
                     style: Theme.of(context).textTheme.headline5.copyWith(
-                        fontWeight: FontWeight.w600, color: MyColors.darkPrimary),
+                        fontWeight: FontWeight.w600,
+                        color: MyColors.darkPrimary),
                   ),
                   MySpaces.vMediumGapInBetween,
                   Container(
@@ -48,36 +49,42 @@ class _LoginState extends State<Login> {
                           key: _formKey,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [TextFormField(
-                              keyboardType: TextInputType.emailAddress,
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                counter: Container(),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                            children: [
+                              TextFormField(
+                                keyboardType: TextInputType.emailAddress,
+                                obscureText: false,
+                                decoration: InputDecoration(
+                                  counter: Container(),
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5)),
+                                  ),
+                                  hintStyle: Theme.of(context)
+                                      .textTheme
+                                      .headline6
+                                      .copyWith(color: Colors.grey[800]),
+                                  hintText: MyStrings.emailAddressLabel,
+                                  fillColor: MyColors.offWhite,
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: MyColors.darkGrey, width: 2.0),
+                                  ),
                                 ),
-                                hintStyle: Theme.of(context)
-                                    .textTheme
-                                    .headline6
-                                    .copyWith(color: Colors.grey[800]),
-                                hintText: MyStrings.emailAddressLabel,
-                                fillColor: MyColors.offWhite,
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
-                                ),
+                                validator: (String email) {
+                                  if (userEmail.isEmpty) {
+                                    Scaffold.of(context).showSnackBar(SnackBar(
+                                        content: Text(MyStrings.emailError)));
+                                    setState(() {
+                                      showSpinner = false;
+                                    });
+                                    return MyStrings.emailError;
+                                  }
+                                  return null;
+                                },
+                                onSaved: (String email) {
+                                  userEmail = email;
+                                },
                               ),
-                              validator: (String email) {
-                                if (userEmail.isEmpty) {
-                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.emailError)));
-                                  setState(() {
-                                    showSpinner = false;
-                                  });
-                                  return MyStrings.emailError;
-                                }
-                                return null;
-                              },
-                              onSaved: (String email) { userEmail = email; },
-                            ),
                               MySpaces.vGapInBetween,
                               TextFormField(
                                   obscureText: true,
@@ -85,7 +92,8 @@ class _LoginState extends State<Login> {
                                   decoration: InputDecoration(
                                     counter: Container(),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5)),
                                     ),
                                     hintStyle: Theme.of(context)
                                         .textTheme
@@ -94,12 +102,16 @@ class _LoginState extends State<Login> {
                                     hintText: MyStrings.passwordLabel,
                                     fillColor: MyColors.offWhite,
                                     focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0),
+                                      borderSide: BorderSide(
+                                          color: MyColors.darkGrey, width: 2.0),
                                     ),
                                   ),
                                   validator: (String password) {
                                     if (userPassword.isEmpty) {
-                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.passwordRequiredError)));
+                                      Scaffold.of(context).showSnackBar(
+                                          SnackBar(
+                                              content: Text(MyStrings
+                                                  .passwordRequiredError)));
                                       setState(() {
                                         showSpinner = false;
                                       });
@@ -107,13 +119,15 @@ class _LoginState extends State<Login> {
                                     }
                                     return null;
                                   },
-                                  onSaved: (String password) { userPassword = password; }
-                              ),
+                                  onSaved: (String password) {
+                                    userPassword = password;
+                                  }),
                               MySpaces.vMediumGapInBetween,
                               RaisedButton(
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8.0)),
                                 ),
                                 padding: EdgeInsets.all(14),
                                 color: MyColors.darkPrimary,
@@ -127,17 +141,20 @@ class _LoginState extends State<Login> {
                                       FocusScope.of(context).unfocus();
                                       final user = await _auth
                                           .signInWithEmailAndPassword(
-                                          email: userEmail,
-                                          password: userPassword);
+                                              email: userEmail,
+                                              password: userPassword);
                                       if (user != null) {
-                                        Scaffold.of(context).showSnackBar(SnackBar(
-                                            content: Text(
-                                                MyStrings.loggingInLabel)));
-                                        Navigator.pushNamed(context, Navigation.id);
+                                        Scaffold.of(context).showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    MyStrings.loggingInLabel)));
+                                        Navigator.pushNamed(
+                                            context, Navigation.id);
                                       } else {
                                         Scaffold.of(context).showSnackBar(
-                                            SnackBar(content: Text(
-                                                MyStrings.incorrectPasswordError)));
+                                            SnackBar(
+                                                content: Text(MyStrings
+                                                    .incorrectPasswordError)));
                                       }
                                       setState(() {
                                         showSpinner = false;
@@ -145,7 +162,9 @@ class _LoginState extends State<Login> {
                                     }
                                   } catch (e) {
                                     print(e);
-                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.somethingWentWrongError)));
+                                    Scaffold.of(context).showSnackBar(SnackBar(
+                                        content: Text(MyStrings
+                                            .somethingWentWrongError)));
                                     setState(() {
                                       showSpinner = false;
                                     });
@@ -163,7 +182,8 @@ class _LoginState extends State<Login> {
                                     ),
                                   ],
                                 ),
-                              ),],
+                              ),
+                            ],
                           ),
                         ),
                         MySpaces.vMediumGapInBetween,

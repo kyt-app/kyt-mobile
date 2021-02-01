@@ -30,15 +30,14 @@ class _NavigationState extends State<Navigation> {
   List _iconColors = [Colors.white54, MyColors.white];
 
   Future<String> getTextFromOCR(List<int> imageBytes) async {
-    final ocrEndpoint = Uri.parse('https://kyt-app-ocr.cognitiveservices.azure.com/vision/v3.1/ocr');
-    final azureResponse = await http.post(
-        ocrEndpoint,
+    final ocrEndpoint = Uri.parse(
+        'https://kyt-app-ocr.cognitiveservices.azure.com/vision/v3.1/ocr');
+    final azureResponse = await http.post(ocrEndpoint,
         headers: <String, String>{
           'Ocp-Apim-Subscription-Key': 'b583a5bb13ff448399982684386e48ac',
           'Content-Type': 'application/octet-stream'
         },
-        body: imageBytes
-    );
+        body: imageBytes);
 
     String ocrText = '';
 
@@ -58,16 +57,15 @@ class _NavigationState extends State<Navigation> {
   }
 
   Future<bool> validateText(String text, String email, String testName) async {
-    final String validationEndpoint = 'https://kyt-api.azurewebsites.net/verify';
-    final validationResponse = await http.post(
-        validationEndpoint,
-        body: <String, String>{
-          'email': email,
-          'testName': testName,
-          'timestamp': '${DateTime.now()}',
-          'text': text
-        }
-    );
+    final String validationEndpoint =
+        'https://kyt-api.azurewebsites.net/verify';
+    final validationResponse =
+        await http.post(validationEndpoint, body: <String, String>{
+      'email': email,
+      'testName': testName,
+      'timestamp': '${DateTime.now()}',
+      'text': text
+    });
 
     if (validationResponse.statusCode == 200) {
       bool valid = json.decode(validationResponse.body)['boolean'];
@@ -75,7 +73,9 @@ class _NavigationState extends State<Navigation> {
     }
 
     print('nothing happened thus returning false');
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text('An unknown error occurred. We were unable to verify the test.')));
+    Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text(
+            'An unknown error occurred. We were unable to verify the test.')));
     return false;
   }
 
@@ -86,10 +86,10 @@ class _NavigationState extends State<Navigation> {
     return Scaffold(
       backgroundColor: MyColors.offWhite,
       body: Container(
-      child: _currentPage[pageIndex],
-      //   child: Center(
+        child: _currentPage[pageIndex],
+        //   child: Center(
 
-      //   ),
+        //   ),
       ),
       bottomNavigationBar: BottomAppBar(
         clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -133,88 +133,102 @@ class _NavigationState extends State<Navigation> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton:  Builder(
+      floatingActionButton: Builder(
         builder: (context) => FloatingActionButton(
           backgroundColor: MyColors.darkPrimary,
-          child: Icon(Icons.add, size: 35,),
+          child: Icon(
+            Icons.add,
+            size: 35,
+          ),
           onPressed: () async {
             showDialog(
               context: context,
               barrierDismissible: true,
-              child: AlertDialog(
+              builder: (context) => AlertDialog(
                   content: SingleChildScrollView(
                       child: ListBody(
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                  'Verify your tests',
-                                  style: Theme.of(context).textTheme.subtitle1.copyWith(
-                                      fontWeight: FontWeight.w600, color: MyColors.darkPrimary)
-                              ),
-                              MySpaces.vGapInBetween,
-                              TextField(
-                                onChanged: (value) {
-                                  testName = value;
-                                },
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                  ),
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                                  ),
-                                  hintStyle: Theme.of(context)
-                                      .textTheme
-                                      .headline6
-                                      .copyWith(color: Colors.grey[800]),
-                                  hintText: 'Test name',
-                                  fillColor: MyColors.offWhite,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: MyColors.darkGrey, width: 1.0),
-                                  ),
-                                ),
-                              )
-                            ],
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Verify your tests',
+                          style: Theme.of(context).textTheme.subtitle1.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: MyColors.darkPrimary)),
+                      MySpaces.vGapInBetween,
+                      TextField(
+                        onChanged: (value) {
+                          testName = value;
+                        },
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
-                          MySpaces.vGapInBetween,
-                          GestureDetector(
-                              child: Text('Take a picture'),
-                              onTap: () async {
-                                Navigator.of(context, rootNavigator: true).pop(); // clears dialog box
-                                final imageFromCamera = await ImagePicker.pickImage(source: ImageSource.camera);
-                                final imageBytes = imageFromCamera.readAsBytesSync();
-                                String ocrText = await getTextFromOCR(imageBytes);
-                                validTest = await validateText(ocrText, user.email, testName);
-                                print('camera intent valid test result: $validTest');
-
-                                !validTest
-                                    ? Scaffold.of(context).showSnackBar(SnackBar(content: Text('We couldn\'t verify your test results. Please try again.')))
-                                    : Scaffold.of(context).showSnackBar(SnackBar(content: Text('Valid test result uploaded. You\'re good to go!')));
-                              }
+                          hintStyle: Theme.of(context)
+                              .textTheme
+                              .headline6
+                              .copyWith(color: Colors.grey[800]),
+                          hintText: 'Test name',
+                          fillColor: MyColors.offWhite,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: MyColors.darkGrey, width: 1.0),
                           ),
-                          Padding(padding: EdgeInsets.all(8.0)),
-                          GestureDetector(
-                            child: Text('Choose from gallery'),
-                            onTap: () async {
-                              Navigator.of(context, rootNavigator: true).pop(); // clears dialog box
-                              final imageFromGallery = await ImagePicker.pickImage(source: ImageSource.gallery);
-                              final imageBytes = imageFromGallery.readAsBytesSync();
-                              String ocrText = await getTextFromOCR(imageBytes);
-                              validTest = await validateText(ocrText, user.email, testName);
-                              print('gallery intent valid test result: $validTest');
-
-                              !validTest
-                                  ? Scaffold.of(context).showSnackBar(SnackBar(content: Text('We couldn\'t verify your test results. Please try again.')))
-                                  : Scaffold.of(context).showSnackBar(SnackBar(content: Text('Valid test result uploaded. You\'re good to go!')));
-                            },
-                          )
-                        ],
+                        ),
                       )
+                    ],
+                  ),
+                  MySpaces.vGapInBetween,
+                  GestureDetector(
+                      child: Text('Take a picture'),
+                      onTap: () async {
+                        Navigator.of(context, rootNavigator: true)
+                            .pop(); // clears dialog box
+                        final imageFromCamera = await ImagePicker.pickImage(
+                            source: ImageSource.camera);
+                        final imageBytes = imageFromCamera.readAsBytesSync();
+                        String ocrText = await getTextFromOCR(imageBytes);
+                        validTest =
+                            await validateText(ocrText, user.email, testName);
+                        print('camera intent valid test result: $validTest');
+
+                        !validTest
+                            ? Scaffold.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'We couldn\'t verify your test results. Please try again.')))
+                            : Scaffold.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'Valid test result uploaded. You\'re good to go!')));
+                      }),
+                  Padding(padding: EdgeInsets.all(8.0)),
+                  GestureDetector(
+                    child: Text('Choose from gallery'),
+                    onTap: () async {
+                      Navigator.of(context, rootNavigator: true)
+                          .pop(); // clears dialog box
+                      final imageFromGallery = await ImagePicker.pickImage(
+                          source: ImageSource.gallery);
+                      final imageBytes = imageFromGallery.readAsBytesSync();
+                      String ocrText = await getTextFromOCR(imageBytes);
+                      validTest =
+                          await validateText(ocrText, user.email, testName);
+                      print('gallery intent valid test result: $validTest');
+
+                      !validTest
+                          ? Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'We couldn\'t verify your test results. Please try again.')))
+                          : Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'Valid test result uploaded. You\'re good to go!')));
+                    },
                   )
-              ),
+                ],
+              ))),
             );
           },
         ),
