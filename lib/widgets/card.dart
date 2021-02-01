@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:kyt/global/myColors.dart';
 
@@ -16,10 +17,8 @@ class VerifyCard extends StatelessWidget {
         onPressed: () {
           Navigator.pushNamed(context, route);
         },
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            side: BorderSide(color: MyColors.darkPrimary, width: 1)),
-        color: MyColors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        color: MyColors.offWhite,
         padding: EdgeInsets.all(18),
         child: Container(
           child: Row(

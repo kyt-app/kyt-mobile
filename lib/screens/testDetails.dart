@@ -2,13 +2,12 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
-import 'package:kyt/screens/home.dart';
-import 'package:kyt/widgets/card.dart';
 import 'package:kyt/screens/navigation.dart';
-import 'package:http/http.dart' as http;
+import 'package:kyt/widgets/card.dart';
 
 Future<String> getTestDetails(String testName, String email) async {
   final testDetailsEndpoint = Uri.parse(
@@ -71,7 +70,22 @@ class _TestDetails extends State<TestDetails> {
           final details = json.decode(snapshot.data);
 
           return Scaffold(
+            backgroundColor: MyColors.offWhite,
             appBar: AppBar(
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Future<String> res =
+                        deleteTest(details['testName'], user.email);
+                    print(res);
+                    Navigator.pushNamed(context, Navigation.id);
+                  },
+                )
+              ],
               backgroundColor: MyColors.darkPrimary,
               title: Text('Test details'),
             ),
@@ -92,7 +106,7 @@ class _TestDetails extends State<TestDetails> {
                                   ? Icons.check
                                   : Icons.clear,
                               color: Colors.white,
-                              size: 120.0))),
+                              size: 100.0))),
                   MySpaces.vGapInBetween,
                   Center(
                     child: Text(details['testName'],
@@ -106,7 +120,7 @@ class _TestDetails extends State<TestDetails> {
                     'Date issued',
                     style: Theme.of(context)
                         .textTheme
-                        .headline5
+                        .headline6
                         .copyWith(color: MyColors.darkPrimary),
                   ),
                   MySpaces.vGapInBetween,
@@ -119,7 +133,7 @@ class _TestDetails extends State<TestDetails> {
                     'Valid until',
                     style: Theme.of(context)
                         .textTheme
-                        .headline5
+                        .headline6
                         .copyWith(color: MyColors.darkPrimary),
                   ),
                   MySpaces.vGapInBetween,
@@ -129,7 +143,7 @@ class _TestDetails extends State<TestDetails> {
                   MySpaces.vMediumGapInBetween,
                   // TODO: add original photo render widget
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       ButtonTheme(
                         minWidth: 100.0,
@@ -143,7 +157,7 @@ class _TestDetails extends State<TestDetails> {
                           child: Text('Re-verify',
                               style: Theme.of(context)
                                   .textTheme
-                                  .headline6
+                                  .subtitle1
                                   .copyWith(color: MyColors.white)),
                           onPressed: () {},
                         ),
@@ -158,16 +172,13 @@ class _TestDetails extends State<TestDetails> {
                                     BorderRadius.all(Radius.circular(6.0))),
                             padding: EdgeInsets.all(14.0),
                             color: MyColors.darkPrimary,
-                            child: Text('Delete',
+                            child: Text('Original image',
                                 style: Theme.of(context)
                                     .textTheme
-                                    .headline6
+                                    .subtitle1
                                     .copyWith(color: MyColors.white)),
                             onPressed: () {
-                              Future<String> res =
-                                  deleteTest(details['testName'], user.email);
-                              print(res);
-                              Navigator.pushNamed(context, Navigation.id);
+                              // do something
                             }),
                       ),
                     ],
