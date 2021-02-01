@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kyt/global/myColors.dart';
@@ -7,8 +8,11 @@ import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/global/myStrings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:kyt/screens/login.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 
 Future<bool> passportCheckIfExists(String passportNumber) async {
   final endpoint = Uri.parse('https://kyt-api.azurewebsites.net/users/register/checkpassport?passportNumber=$passportNumber');
@@ -29,8 +33,9 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final _auth = FirebaseAuth.instance;
+  final _storage = firebase_storage.FirebaseStorage.instance;
   final _formKey = GlobalKey<FormState>();
-  String userName, userEmail, phoneNumber, userCountry, userPassportNumber, userPassword;
+  String userName, userEmail, phoneNumber, userCountry, userPassportNumber, userPassword, userPfpPath, userPfpUrl;
   int kytNumber;
   List<String> countries = ['India', 'USA'];
   bool showSpinner = false;
@@ -147,21 +152,20 @@ class _RegisterState extends State<Register> {
                                       child: Text(country)
                                   );
                                 }).toList(),
-                                onChanged: (country) { setState(() {
-                                  userCountry = country;
-                                }); },
+                                onChanged: (country) {
+                                  setState(() {
+                                    userCountry = country;
+                                  });
+                                },
                               ),
                               MySpaces.vGapInBetween,
                               TextFormField(
                                 decoration: InputDecoration(
                                   counter: Container(),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                                      borderRadius: BorderRadius.all(Radius.circular(5.0))
                                   ),
-                                  hintStyle: Theme.of(context)
-                                      .textTheme
-                                      .headline6
-                                      .copyWith(color: Colors.grey[800]),
+                                  hintStyle: Theme.of(context).textTheme.headline6.copyWith(color: Colors.grey[800]),
                                   hintText: MyStrings.passportLabel,
                                   fillColor: MyColors.offWhite,
                                   focusedBorder: OutlineInputBorder(
@@ -169,6 +173,7 @@ class _RegisterState extends State<Register> {
                                   ),
                                 ),
                                 keyboardType: TextInputType.text,
+                                onSaved: (String passport) { userPassportNumber = passport; },
                                 validator: (String passport) {
                                   if (userCountry == 'India') {
                                     RegExp indianPassport = RegExp(r"^[A-PR-WYa-pr-wy][1-9]\d{5}[1-9]$");
@@ -186,7 +191,6 @@ class _RegisterState extends State<Register> {
                                     return null;
                                   }
                                 },
-                                onSaved: (String passport) { userPassportNumber = passport; },
                               ),
                               MySpaces.vGapInBetween,
                               TextFormField(
@@ -215,6 +219,29 @@ class _RegisterState extends State<Register> {
                                   return null;
                                 },
                                 onSaved: (String password) { userPassword = password; },
+                              ),
+                              MySpaces.vGapInBetween,
+                              RaisedButton(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                                ),
+                                padding: EdgeInsets.all(14.0),
+                                color: MyColors.darkPrimary,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                          'Upload PFP',
+                                          style: Theme.of(context).textTheme.headline6.copyWith(color: MyColors.white)
+                                      )
+                                    ]
+                                ),
+                                onPressed: () async {
+                                  final pfpImage = await ImagePicker.pickImage(source: ImageSource.gallery);
+                                  userPfpPath = pfpImage.path;
+                                  print(pfpImage.path);
+                                },
                               ),
                               MySpaces.vSmallGapInBetween,
                               RaisedButton(
@@ -248,6 +275,24 @@ class _RegisterState extends State<Register> {
                                       // firebase auth
                                       final newUser = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
 
+                                      if (userPfpPath != null) {
+                                        final File userPfp = File(userPfpPath);
+                                        firebase_storage.UploadTask userPfpUploadTask = _storage.ref('$userEmail/pfp/${basename(userPfpPath)}').putFile(userPfp);
+
+                                        try {
+                                          firebase_storage.TaskSnapshot snapshot = await userPfpUploadTask;
+                                          // get download url of uploaded image
+                                          userPfpUrl = await _storage.ref('$userEmail/pfp/${basename(userPfpPath)}').getDownloadURL();
+                                          print('uploaded pfp.');
+                                          print(userPfpUrl);
+                                        } catch (e) {
+                                          print(userPfpUploadTask.snapshot);
+                                        }
+                                      } else {
+                                        // random placeholder pfp
+                                        userPfpUrl = 'https://i.imgur.com/twPSMdV.jpg';
+                                      }
+
                                       // generate unique kytNumber
                                       kytNumber = 100000 + Random().nextInt(999999 - 100000);
 
@@ -261,7 +306,8 @@ class _RegisterState extends State<Register> {
                                           'email': userEmail,
                                           'country': userCountry,
                                           'passportNumber': userPassportNumber,
-                                          'kytNumber': kytNumber.toString()
+                                          'kytNumber': kytNumber.toString(),
+                                          'pfpUrl': userPfpUrl
                                         }),
                                       );
 
