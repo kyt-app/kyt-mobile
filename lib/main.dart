@@ -5,9 +5,7 @@ import 'screens/login.dart';
 import 'screens/register.dart';
 import 'screens/welcome.dart';
 import 'screens/navigation.dart';
-import 'screens/verification/1.dart';
-import 'screens/verification/2.dart';
-import 'screens/verification/3.dart';
+import 'screens/testDetails.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,9 +36,7 @@ class Kyt extends StatelessWidget {
               Register.id: (context) => Register(),
               Welcome.id: (context) => Welcome(),
               Navigation.id: (context) => Navigation(),
-              Verification1.id: (context) => Verification1(),
-              Verification2.id: (context) => Verification2(),
-              Verification3.id: (context) => Verification3(),
+              TestDetails.id: (context) => TestDetails(),
             },
           );
         }

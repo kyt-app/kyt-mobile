@@ -5,6 +5,7 @@ import 'package:kyt/global/mySpaces.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kyt/widgets/testCard.dart';
 
 Future<String> getUserTests(String email) async {
   final testsEndpoint = Uri.parse('https://kyt-api.azurewebsites.net/profile?email=$email');
@@ -32,7 +33,14 @@ class _HomeState extends State<Home> {
       future: getUserTests(user.email),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return Scaffold(
+              backgroundColor: MyColors.offWhite,
+              appBar: AppBar(
+                  backgroundColor: MyColors.darkPrimary,
+                  title: Text('Home')
+              ),
+              body: Center(child: CircularProgressIndicator())
+          );
         }
 
         final userProfile = json.decode(snapshot.data);
@@ -69,34 +77,29 @@ class _HomeState extends State<Home> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Text(
-                                  '${userProfile['name']}\'s\nHealth-care records',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5
-                                      .copyWith(
-                                      color: MyColors.darkPrimary,
-                                      fontWeight: FontWeight.bold),
+                                Center(
+                                  child: Text(
+                                    '${userProfile['name']}\'s\nHealth-care records',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline4
+                                        .copyWith(
+                                        color: MyColors.darkPrimary,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                                MySpaces.vMediumGapInBetween,
+                                MySpaces.vSmallGapInBetween,
                                 Container(
                                   height: 250.0,
                                   child: ListView.builder(
+                                    padding: EdgeInsets.all(0.0),
                                     shrinkWrap: true,
                                     itemCount: userProfile['tests'].length,
                                     itemBuilder: (context, index) {
                                       final test = userProfile['tests'][index];
-                                      return ListTile(
-                                          trailing: test['status'] == 'valid'
-                                              ? Icon(Icons.check, color: MyColors.green)
-                                              : Icon(Icons.clear, color: Colors.red),
-                                          title: Text(
-                                              test['testName'],
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18.0
-                                              )
-                                          )
+                                      return TestCard(
+                                        iconBool: test['status'] == 'valid' ? true : false,
+                                        text: test['testName']
                                       );
                                     },
                                   ),
