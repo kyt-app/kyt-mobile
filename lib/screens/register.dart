@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:kyt/global/myColors.dart';
@@ -8,7 +9,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:kyt/screens/login.dart';
 import 'package:http/http.dart' as http;
-import 'dart:math';
+
+Future<bool> passportCheckIfExists(String passportNumber) async {
+  final endpoint = Uri.parse('https://kyt-api.azurewebsites.net/users/register/checkpassport?passportNumber=$passportNumber');
+  final response = await http.get(endpoint);
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body)['boolean'];
+  }
+
+  return null;
+}
 
 class Register extends StatefulWidget {
   static String id = "register";
@@ -228,39 +239,46 @@ class _RegisterState extends State<Register> {
                                   if (_formKey.currentState.validate()) {
                                     FocusScope.of(context).unfocus();
 
-                                    print(MyStrings.registeringLabel);
-                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.registeringLabel + userName)));
+                                    final passportExists = await passportCheckIfExists(userPassportNumber);
+                                    
+                                    if (!passportExists) {
+                                      print(MyStrings.registeringLabel);
+                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.registeringLabel + userName)));
 
-                                    // firebase auth
-                                    final newUser = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
+                                      // firebase auth
+                                      final newUser = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
 
-                                    // generate unique kytNumber
-                                    kytNumber = 100000 + Random().nextInt(999999 - 100000);
+                                      // generate unique kytNumber
+                                      kytNumber = 100000 + Random().nextInt(999999 - 100000);
 
-                                    // push user details to db
-                                    final http.Response response = await http.post(
-                                      'https://kyt-api.azurewebsites.net/users/register',
-                                      headers: <String, String>{ 'Content-Type': 'application/json; charset=UTF-8' },
-                                      body: jsonEncode(<String, String>{
-                                        'name': userName,
-                                        'phoneNumber': phoneNumber,
-                                        'email': userEmail,
-                                        'country': userCountry,
-                                        'passportNumber': userPassportNumber,
-                                        'kytNumber': kytNumber.toString()
-                                      }),
-                                    );
+                                      // push user details to db
+                                      final http.Response response = await http.post(
+                                        'https://kyt-api.azurewebsites.net/users/register',
+                                        headers: <String, String>{ 'Content-Type': 'application/json; charset=UTF-8' },
+                                        body: jsonEncode(<String, String>{
+                                          'name': userName,
+                                          'phoneNumber': phoneNumber,
+                                          'email': userEmail,
+                                          'country': userCountry,
+                                          'passportNumber': userPassportNumber,
+                                          'kytNumber': kytNumber.toString()
+                                        }),
+                                      );
 
-                                    if (newUser != null) {
-                                      Navigator.pushNamed(context, Login.id);
-                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Registration successful. Welcome aboard!')));
-                                    }
+                                      if (newUser != null) {
+                                        Navigator.pushNamed(context, Login.id);
+                                        Scaffold.of(context).showSnackBar(SnackBar(content: Text('Registration successful. Welcome aboard!')));
+                                      }
 
-                                    if (response.statusCode == 201) {
-                                      return print('Reg done');
+                                      if (response.statusCode == 201) {
+                                        return print('Reg done');
+                                      } else {
+                                        print("Reg failed.");
+                                        throw Exception('Failed to create user.');
+                                      }
+
                                     } else {
-                                      print("Reg failed.");
-                                      throw Exception('Failed to create user.');
+                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text('The entered passport number is already registered with a different account.')));
                                     }
                                   }
                                 },
