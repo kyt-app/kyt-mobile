@@ -72,7 +72,6 @@ class _SettingsState extends State<Settings> {
           SettingsRow(
             icon: Icons.privacy_tip,
             label: 'Privacy and safety',
-            isUpload: null,
           ),
           SettingsRow(
             icon: Icons.privacy_tip,
