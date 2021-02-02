@@ -7,7 +7,10 @@ import 'package:intl/intl.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/screens/navigation.dart';
+import 'package:kyt/screens/upload.dart';
 import 'package:kyt/widgets/card.dart';
+
+import 'upload.dart';
 
 Future<String> getTestDetails(String testName, String email) async {
   final testDetailsEndpoint = Uri.parse(
@@ -145,23 +148,29 @@ class _TestDetails extends State<TestDetails> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      ButtonTheme(
-                        minWidth: 100.0,
-                        child: RaisedButton(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(6.0))),
-                          padding: EdgeInsets.all(14.0),
-                          color: MyColors.darkPrimary,
-                          child: Text('Re-verify',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1
-                                  .copyWith(color: MyColors.white)),
-                          onPressed: () {},
-                        ),
-                      ),
+                      details['status'] == 'invalid'
+                          ? ButtonTheme(
+                              minWidth: 100.0,
+                              child: RaisedButton(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6.0))),
+                                padding: EdgeInsets.all(14.0),
+                                color: MyColors.darkPrimary,
+                                child: Text('Re-verify',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1
+                                        .copyWith(color: MyColors.white)),
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          Upload(details['testName'])));
+                                },
+                              ),
+                            )
+                          : SizedBox(width: 0.0),
                       SizedBox(width: 10.0),
                       ButtonTheme(
                         minWidth: 100.0,

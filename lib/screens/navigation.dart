@@ -21,7 +21,13 @@ class _NavigationState extends State<Navigation> {
   int secondIconColorInt = 0;
   int thirdIconColorInt = 0;
   int fourthIconColorInt = 0;
-  List _currentPage = [Home(), QRCode(), Upload(), Settings(), ReportABug()];
+  List _currentPage = [
+    Home(),
+    QRCode(),
+    Upload('nav'),
+    Settings(),
+    ReportABug()
+  ];
   List _iconColors = [Colors.white54, Colors.white];
 
   @override
