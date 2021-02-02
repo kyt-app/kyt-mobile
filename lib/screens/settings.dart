@@ -75,18 +75,22 @@ class _SettingsState extends State<Settings> {
           SettingsRow(
             icon: Icons.privacy_tip,
             label: 'Privacy and safety',
+            onPressed: () {},
           ),
           SettingsRow(
             icon: Icons.privacy_tip,
             label: 'Privacy and safety',
+            onPressed: () {},
           ),
           SettingsRow(
             icon: Icons.privacy_tip,
             label: 'Privacy and safety',
+            onPressed: () {},
           ),
           SettingsRow(
             icon: Icons.privacy_tip,
             label: 'Privacy and safety',
+            onPressed: () {},
           ),
         ],
       ),
