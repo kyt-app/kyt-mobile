@@ -31,8 +31,10 @@ class _SettingsState extends State<Settings> {
       backgroundColor: MyColors.offWhite,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
+              margin: EdgeInsets.only(bottom: MyDimens.double_30),
               color: MyColors.darkPrimary,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height * 0.3,
@@ -56,10 +58,21 @@ class _SettingsState extends State<Settings> {
                   )
                 ],
               )),
+          Padding(
+            padding: EdgeInsets.only(left: 38.0),
+            child: Text(
+              'Settings'.toUpperCase(),
+              style: Theme.of(context).textTheme.subtitle1.copyWith(
+                  color: MyColors.darkPrimary,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14),
+            ),
+          ),
           MySpaces.vGapInBetween,
           SettingsRow(
             icon: Icons.privacy_tip,
             label: 'Privacy and safety',
+            isUpload: null,
           ),
           SettingsRow(
             icon: Icons.privacy_tip,
@@ -74,23 +87,6 @@ class _SettingsState extends State<Settings> {
             label: 'Privacy and safety',
           ),
         ],
-      ),
-    );
-  }
-}
-
-class vSeparator extends StatelessWidget {
-  const vSeparator({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 1,
-      width: MediaQuery.of(context).size.width,
-      child: const DecoratedBox(
-        decoration: const BoxDecoration(color: MyColors.darkPrimary),
       ),
     );
   }

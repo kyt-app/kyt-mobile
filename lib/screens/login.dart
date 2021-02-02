@@ -1,12 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/global/myStrings.dart';
-import 'package:kyt/screens/home.dart';
-import 'package:kyt/screens/register.dart';
 import 'package:kyt/screens/navigation.dart';
+import 'package:kyt/screens/register.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
   static String id = "login";

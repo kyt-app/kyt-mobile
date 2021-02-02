@@ -92,13 +92,14 @@ class _HomeState extends State<Home> {
                         children: <Widget>[
                           Padding(
                             child: Text(
-                              'Health care records',
+                              'Health care records'.toUpperCase(),
                               style: Theme.of(context)
                                   .textTheme
                                   .subtitle1
                                   .copyWith(
                                       color: MyColors.darkPrimary,
-                                      fontWeight: FontWeight.normal),
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 14),
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 8),
                           ),
