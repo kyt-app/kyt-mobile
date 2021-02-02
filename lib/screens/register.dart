@@ -36,7 +36,14 @@ class _RegisterState extends State<Register> {
   final _auth = FirebaseAuth.instance;
   final _storage = firebase_storage.FirebaseStorage.instance;
   final _formKey = GlobalKey<FormState>();
-  String userName, userEmail, phoneNumber, userCountry, userPassportNumber, userPassword, userPfpPath, userPfpUrl;
+  String userName,
+      userEmail,
+      phoneNumber,
+      userCountry,
+      userPassportNumber,
+      userPassword,
+      userPfpPath,
+      userPfpUrl;
   int kytNumber;
   List<String> countries = ['India', 'USA'];
   bool showSpinner = false;
@@ -335,42 +342,63 @@ class _RegisterState extends State<Register> {
 
                                           if (!passportExists) {
                                             print(MyStrings.registeringLabel);
-                                            Scaffold.of(context).showSnackBar(SnackBar(content: Text(MyStrings.registeringLabel + userName)));
+                                            Scaffold.of(context).showSnackBar(
+                                                SnackBar(
+                                                    content: Text(MyStrings
+                                                            .registeringLabel +
+                                                        userName)));
 
                                             // firebase auth
-                                            final newUser = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
+                                            final newUser = await _auth
+                                                .createUserWithEmailAndPassword(
+                                                    email: userEmail,
+                                                    password: userPassword);
 
                                             if (userPfpPath != null) {
-                                              final File userPfp = File(userPfpPath);
-                                              firebase_storage.UploadTask userPfpUploadTask = _storage.ref('$userEmail/pfp/${basename(userPfpPath)}').putFile(userPfp);
+                                              final File userPfp =
+                                                  File(userPfpPath);
+                                              firebase_storage.UploadTask
+                                                  userPfpUploadTask = _storage
+                                                      .ref(
+                                                          '$userEmail/pfp/${basename(userPfpPath)}')
+                                                      .putFile(userPfp);
 
                                               try {
-                                                firebase_storage.TaskSnapshot snapshot = await userPfpUploadTask;
+                                                firebase_storage.TaskSnapshot
+                                                    snapshot =
+                                                    await userPfpUploadTask;
                                                 // get download url of uploaded image
-                                                userPfpUrl = await _storage.ref('$userEmail/pfp/${basename(userPfpPath)}').getDownloadURL();
+                                                userPfpUrl = await _storage
+                                                    .ref(
+                                                        '$userEmail/pfp/${basename(userPfpPath)}')
+                                                    .getDownloadURL();
 
                                                 print('uploaded pfp.');
                                                 print(userPfpUrl);
                                               } catch (e) {
-                                                print(userPfpUploadTask.snapshot);
+                                                print(
+                                                    userPfpUploadTask.snapshot);
                                               }
                                             } else {
                                               // random placeholder pfp
-                                              userPfpUrl = 'https://i.imgur.com/twPSMdV.jpg';
+                                              userPfpUrl =
+                                                  'https://i.imgur.com/XYX9Mtm.png';
                                             }
 
                                             // update firebase auth user object
                                             final user = _auth.currentUser;
                                             await user.updateProfile(
-                                              displayName: userName,
-                                              photoURL: userPfpUrl
-                                            );
+                                                displayName: userName,
+                                                photoURL: userPfpUrl);
 
                                             // generate unique kytNumber
-                                            kytNumber = 100000 + Random().nextInt(999999 - 100000);
+                                            kytNumber = 100000 +
+                                                Random()
+                                                    .nextInt(999999 - 100000);
 
                                             // push user details to db
-                                            final http.Response response = await http.post(
+                                            final http.Response response =
+                                                await http.post(
                                               'https://kyt-api.azurewebsites.net/users/register',
                                               headers: <String, String>{
                                                 'Content-Type':
@@ -381,26 +409,36 @@ class _RegisterState extends State<Register> {
                                                 'phoneNumber': phoneNumber,
                                                 'email': userEmail,
                                                 'country': userCountry,
-                                                'passportNumber': userPassportNumber,
-                                                'kytNumber': kytNumber.toString(),
+                                                'passportNumber':
+                                                    userPassportNumber,
+                                                'kytNumber':
+                                                    kytNumber.toString(),
                                                 'pfpUrl': userPfpUrl
                                               }),
                                             );
 
                                             if (newUser != null) {
-                                              Navigator.pushNamed(context, Login.id);
+                                              Navigator.pushNamed(
+                                                  context, Login.id);
                                               // FIXME: this snackbar does not show up
-                                              Scaffold.of(context).showSnackBar(SnackBar(content: Text('Registration successful. Welcome aboard!')));
+                                              Scaffold.of(context).showSnackBar(
+                                                  SnackBar(
+                                                      content: Text(
+                                                          'Registration successful. Welcome aboard!')));
                                             }
 
                                             if (response.statusCode == 201) {
                                               return print('Reg done');
                                             } else {
                                               print("Reg failed.");
-                                              throw Exception('Failed to create user.');
+                                              throw Exception(
+                                                  'Failed to create user.');
                                             }
                                           } else {
-                                            Scaffold.of(context).showSnackBar(SnackBar(content: Text('The entered passport number is already registered with a different account.')));
+                                            Scaffold.of(context).showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'The entered passport number is already registered with a different account.')));
                                           }
                                         }
                                       },
@@ -410,12 +448,10 @@ class _RegisterState extends State<Register> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: <Widget>[
-                                        Text(
-                                            MyStrings.alreadyAnAccountLabel,
+                                        Text(MyStrings.alreadyAnAccountLabel,
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .subtitle1
-                                        ),
+                                                .subtitle1),
                                         Text(" "),
                                         GestureDetector(
                                             onTap: () {
@@ -427,20 +463,15 @@ class _RegisterState extends State<Register> {
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .subtitle1
-                                                    .copyWith(color: MyColors.green)))
+                                                    .copyWith(
+                                                        color: MyColors.green)))
                                       ],
                                     )
                                   ],
-                                )
-                            )
-                        )
+                                )))
                       ],
                     ),
-                  )
-                  )
-              )
-          ),
-        )
-    );
+                  )))),
+        ));
   }
 }

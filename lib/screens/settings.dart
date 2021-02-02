@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
@@ -25,6 +26,8 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,14 +48,14 @@ class _SettingsState extends State<Settings> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(MyDimens.double_200),
                     child: Image.network(
-                      'https://github.com/rchtgpt.png',
+                      '${user.photoURL}',
                       height: 100.0,
                       width: 100.0,
                     ),
                   ),
                   MySpaces.vGapInBetween,
                   Text(
-                    'Rachit Gupta',
+                    '${user.displayName}',
                     style: Theme.of(context).textTheme.headline6.copyWith(
                         color: MyColors.white, fontWeight: FontWeight.bold),
                   )

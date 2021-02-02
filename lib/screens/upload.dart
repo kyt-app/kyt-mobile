@@ -10,11 +10,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
+import 'package:kyt/screens/navigation.dart';
 import 'package:path/path.dart';
 import '../widgets/settingsRow.dart';
 
 Future<String> getTextFromOCR(List<int> imageBytes) async {
-  final ocrEndpoint = Uri.parse('https://kyt-app-ocr.cognitiveservices.azure.com/vision/v3.1/ocr');
+  final ocrEndpoint = Uri.parse(
+      'https://kyt-app-ocr.cognitiveservices.azure.com/vision/v3.1/ocr');
   final azureResponse = await http.post(ocrEndpoint,
       headers: <String, String>{
         'Ocp-Apim-Subscription-Key': 'b583a5bb13ff448399982684386e48ac',
@@ -39,18 +41,17 @@ Future<String> getTextFromOCR(List<int> imageBytes) async {
   return ocrText;
 }
 
-Future<bool> validateAndUploadData(String text, String email, String testName, String testImageUrl) async {
+Future<bool> validateAndUploadData(
+    String text, String email, String testName, String testImageUrl) async {
   final String validationEndpoint = 'https://kyt-api.azurewebsites.net/verify';
-  final validationResponse = await http.post(
-      validationEndpoint,
-      body: <String, String>{
-        'email': email,
-        'testName': testName,
-        'timestamp': '${DateTime.now()}',
-        'text': text,
-        'imageUrl': testImageUrl
-      }
-  );
+  final validationResponse =
+      await http.post(validationEndpoint, body: <String, String>{
+    'email': email,
+    'testName': testName,
+    'timestamp': '${DateTime.now()}',
+    'text': text,
+    'imageUrl': testImageUrl
+  });
 
   if (validationResponse.statusCode == 200) {
     bool valid = json.decode(validationResponse.body)['boolean'];
@@ -73,10 +74,14 @@ class _UploadState extends State<Upload> {
   String imagePath, testName;
   final user = FirebaseAuth.instance.currentUser;
   final _storage = firebase_storage.FirebaseStorage.instance;
+  bool showProgress = false;
+  String progressMessage = "";
+  var msgController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: MyColors.offWhite,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -94,14 +99,14 @@ class _UploadState extends State<Upload> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(MyDimens.double_200),
                     child: Image.network(
-                      'https://github.com/rchtgpt.png',
+                      '${user.photoURL}',
                       height: 100.0,
                       width: 100.0,
                     ),
                   ),
                   MySpaces.vGapInBetween,
                   Text(
-                    'Rachit Gupta',
+                    '${user.displayName}',
                     style: Theme.of(context).textTheme.headline6.copyWith(
                         color: MyColors.white, fontWeight: FontWeight.bold),
                   )
@@ -110,31 +115,31 @@ class _UploadState extends State<Upload> {
           Padding(
             padding: EdgeInsets.only(left: 38.0),
             child: Text(
-              'Add prescription'.toUpperCase(),
-              style: Theme.of(context)
-                  .textTheme
-                  .subtitle1
-                  .copyWith(
-                    color: MyColors.darkPrimary,
-                    fontWeight: FontWeight.normal,
-                    fontSize: 14.0
-              ),
+              'Add test result'.toUpperCase(),
+              style: Theme.of(context).textTheme.subtitle1.copyWith(
+                  color: MyColors.darkPrimary,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14.0),
             ),
           ),
           MySpaces.vGapInBetween,
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 38.0),
             child: TextFormField(
+              controller: msgController,
               decoration: InputDecoration(
                 counter: Container(),
-                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
                 hintStyle: Theme.of(context)
                     .textTheme
                     .headline6
                     .copyWith(color: Colors.grey[800]),
                 hintText: 'Test name',
                 fillColor: MyColors.offWhite,
-                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0)),
+                focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: MyColors.darkGrey, width: 2.0)),
               ),
               validator: (String testName) {
                 return testName.isEmpty ? 'Name is required' : null;
@@ -146,70 +151,122 @@ class _UploadState extends State<Upload> {
           ),
           MySpaces.vGapInBetween,
           SettingsRow(
-            label: 'Take picture',
-            icon: Icons.camera_alt,
-            onPressed: () async {
-              if (testName == null) {
-                return Scaffold.of(context).showSnackBar(SnackBar(content: Text('Please enter the test name before proceeding.')));
-              }
-              // get image from camera
-              final imageFromCamera = await ImagePicker.pickImage(source: ImageSource.camera);
-              print('camera image path: ${imageFromCamera.path}');
+              label: 'Take picture',
+              icon: Icons.camera_alt,
+              onPressed: () async {
+                if (testName == null) {
+                  return Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'Please enter the test name before proceeding.')));
+                }
+                // get image from camera
+                final imageFromCamera =
+                    await ImagePicker.pickImage(source: ImageSource.camera);
+                print('camera image path: ${imageFromCamera.path}');
 
-              // initialize test image url
-              String testImageUrl;
+                setState(() {
+                  showProgress = true;
+                });
 
-              // start firebase upload task
-              firebase_storage.UploadTask testImageUploadTask = _storage.ref('${user.email}/tests/${basename(imageFromCamera.path)}').putFile(imageFromCamera);
+                // initialize test image url
+                String testImageUrl;
 
-              // push download url of uploaded image to testImageUrl string
-              try {
-                firebase_storage.TaskSnapshot snapshot = await testImageUploadTask;
-                testImageUrl = await _storage.ref('${user.email}/tests/${basename(imageFromCamera.path)}').getDownloadURL();
-                print('uploaded image url: $testImageUrl');
-              } catch (e) {
-                print(testImageUploadTask.snapshot);
-              }
+                // start firebase upload task
+                firebase_storage.UploadTask testImageUploadTask = _storage
+                    .ref(
+                        '${user.email}/tests/${basename(imageFromCamera.path)}')
+                    .putFile(imageFromCamera);
 
-              print('starting to read bytes');
+                setState(() {
+                  progressMessage = "Uploading to server";
+                });
 
-              // start azure vision ocr task
-              final imageBytes = imageFromCamera.readAsBytesSync();
-              String ocrText = await getTextFromOCR(imageBytes);
+                // push download url of uploaded image to testImageUrl string
+                try {
+                  firebase_storage.TaskSnapshot snapshot =
+                      await testImageUploadTask;
+                  testImageUrl = await _storage
+                      .ref(
+                          '${user.email}/tests/${basename(imageFromCamera.path)}')
+                      .getDownloadURL();
+                  print('uploaded image url: $testImageUrl');
+                } catch (e) {
+                  print(testImageUploadTask.snapshot);
+                }
 
-              print('ocr was completed');
+                print('starting to read bytes');
 
-              // push data to db and validate test result
-              validTest = await validateAndUploadData(ocrText, user.email, testName, testImageUrl);
-              print('camera intent valid test result: $validTest');
+                setState(() {
+                  progressMessage = "Reading bytes";
+                });
 
-              // return response according to test result
-              !validTest
-                  ? Scaffold.of(context).showSnackBar(SnackBar(content: Text('The result uploaded is not authentic. You may be ineligible for travel.')))
-                  : Scaffold.of(context).showSnackBar(SnackBar(content: Text('Valid test result uploaded. You\'re good to go!')));
-            }
-          ),
+                // start azure vision ocr task
+                final imageBytes = imageFromCamera.readAsBytesSync();
+                setState(() {
+                  progressMessage = "Running OCR";
+                });
+                String ocrText = await getTextFromOCR(imageBytes);
+
+                print('ocr was completed');
+
+                // push data to db and validate test result
+                validTest = await validateAndUploadData(
+                    ocrText, user.email, testName, testImageUrl);
+                setState(() {
+                  progressMessage = "Validating";
+                });
+                print('camera intent valid test result: $validTest');
+                setState(() {
+                  // set the progress indicator to true so it would not be visible
+                  showProgress = false;
+                });
+                // return response according to test result
+                !validTest
+                    ? Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            'The result uploaded is not authentic. You may be ineligible for travel.')))
+                    : Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            'Valid test result uploaded. You\'re good to go!')));
+              }),
           SettingsRow(
             label: 'Upload from gallery',
             icon: Icons.photo,
             onPressed: () async {
               if (testName == null) {
-                return Scaffold.of(context).showSnackBar(SnackBar(content: Text('Please enter the test name before proceeding.')));
+                return Scaffold.of(context).showSnackBar(SnackBar(
+                    content:
+                        Text('Please enter the test name before proceeding.')));
               }
               // choose image from gallery
-              final imageFromGallery = await ImagePicker.pickImage(source: ImageSource.gallery);
+              final imageFromGallery =
+                  await ImagePicker.pickImage(source: ImageSource.gallery);
               print('gallery image path: ${imageFromGallery.path}');
+
+              setState(() {
+                showProgress = true;
+              });
 
               // initialize test image url
               String testImageUrl;
 
               // start firebase upload task
-              firebase_storage.UploadTask testImageUploadTask = _storage.ref('${user.email}/tests/${basename(imageFromGallery.path)}').putFile(imageFromGallery);
+              firebase_storage.UploadTask testImageUploadTask = _storage
+                  .ref('${user.email}/tests/${basename(imageFromGallery.path)}')
+                  .putFile(imageFromGallery);
+
+              setState(() {
+                progressMessage = "Uploading to server";
+              });
 
               // push download url of uploaded image to testImageUrl string
               try {
-                firebase_storage.TaskSnapshot snapshot = await testImageUploadTask;
-                testImageUrl = await _storage.ref('${user.email}/tests/${basename(imageFromGallery.path)}').getDownloadURL();
+                firebase_storage.TaskSnapshot snapshot =
+                    await testImageUploadTask;
+                testImageUrl = await _storage
+                    .ref(
+                        '${user.email}/tests/${basename(imageFromGallery.path)}')
+                    .getDownloadURL();
                 print('uploaded image: $testImageUrl');
               } catch (e) {
                 print(testImageUploadTask.snapshot);
@@ -217,25 +274,82 @@ class _UploadState extends State<Upload> {
 
               print('starting to read bytes');
 
+              setState(() {
+                progressMessage = "Reading bytes";
+              });
+
               // start azure vision ocr task
               final imageBytes = imageFromGallery.readAsBytesSync();
+              setState(() {
+                progressMessage = "Running OCR";
+              });
               String ocrText = await getTextFromOCR(imageBytes);
 
               print('ocr was completed.');
 
               // push data to db and validate test result
-              validTest = await validateAndUploadData(ocrText, user.email, testName, testImageUrl);
+              validTest = await validateAndUploadData(
+                  ocrText, user.email, testName, testImageUrl);
+              setState(() {
+                progressMessage = "Validating";
+              });
               print('gallery intent valid test result: $validTest');
-
+              setState(() {
+                // set the progress indicator to true so it would not be visible
+                showProgress = false;
+              });
               // return response to user according to test result
-              !validTest
-                  ? Scaffold.of(context).showSnackBar(SnackBar(content: Text('The result uploaded is not authentic. You may be ineligible for travel.')))
-                  : Scaffold.of(context).showSnackBar(SnackBar(content: Text('Valid test result uploaded. You\'re good to go!')));
+              if (!validTest) {
+                msgController.clear();
+                Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        'The result uploaded is not authentic. You may be ineligible for travel.')));
+              } else {
+                msgController.clear();
+                Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        'Valid test result uploaded. You\'re good to go!')));
+              }
             },
+          ),
+          Container(
+            height: 100,
+            width: double.infinity,
+            color: MyColors.offWhite,
+            child: Center(
+                // use ternary operator to decide when to show progress indicator
+                child: showProgress
+                    ? Container(
+                        padding: EdgeInsets.all(16),
+                        color: MyColors.offWhite,
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _getLoadingIndicator(),
+                              _getText(progressMessage)
+                            ]))
+                    : null),
           ),
         ],
       ),
     );
   }
-}
 
+  Widget _getLoadingIndicator() {
+    return Padding(
+        child: Container(
+            child: CircularProgressIndicator(strokeWidth: 3),
+            width: 32,
+            height: 32),
+        padding: EdgeInsets.only(bottom: 16));
+  }
+
+  Widget _getText(String displayedText) {
+    return Text(
+      displayedText,
+      style: TextStyle(color: MyColors.darkPrimary, fontSize: 14),
+      textAlign: TextAlign.center,
+    );
+  }
+}

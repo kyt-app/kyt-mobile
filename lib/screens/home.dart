@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
           final userProfile = json.decode(snapshot.data);
 
           return Scaffold(
-            resizeToAvoidBottomPadding: false,
+            resizeToAvoidBottomInset: false,
             backgroundColor: MyColors.offWhite,
             body: Container(
               child: Column(
@@ -67,14 +67,14 @@ class _HomeState extends State<Home> {
                             borderRadius:
                                 BorderRadius.circular(MyDimens.double_200),
                             child: Image.network(
-                              '${userProfile['pfp']}',
+                              '${user.photoURL}',
                               height: 100.0,
                               width: 100.0,
                             ),
                           ),
                           MySpaces.vGapInBetween,
                           Text(
-                            'Rachit Gupta',
+                            '${user.displayName}',
                             style: Theme.of(context)
                                 .textTheme
                                 .headline6
