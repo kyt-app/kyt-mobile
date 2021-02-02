@@ -7,6 +7,7 @@ import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/widgets/settingsRow.dart';
+import 'package:kyt/screens/about.dart';
 
 Future<String> getQRCodeLink(String email) async {
   final qrCodeEndpoint =
@@ -57,12 +58,10 @@ class _SettingsState extends State<Settings> {
                   Text(
                     '${user.displayName}',
                     style: Theme.of(context).textTheme.headline6.copyWith(
-                        color: MyColors.white, fontWeight: FontWeight.bold
-                    ),
+                        color: MyColors.white, fontWeight: FontWeight.bold),
                   )
                 ],
-              )
-          ),
+              )),
           Padding(
             padding: EdgeInsets.only(left: 38.0),
             child: Text(
@@ -75,25 +74,18 @@ class _SettingsState extends State<Settings> {
           ),
           MySpaces.vGapInBetween,
           SettingsRow(
-            icon: Icons.privacy_tip,
-            label: 'Privacy and safety',
+            icon: Icons.edit,
+            label: 'Edit Profile',
             onPressed: () {},
           ),
           SettingsRow(
-            icon: Icons.privacy_tip,
-            label: 'Privacy and safety',
-            onPressed: () {},
-          ),
-          SettingsRow(
-            icon: Icons.privacy_tip,
-            label: 'Privacy and safety',
-            onPressed: () {},
-          ),
-          SettingsRow(
-            icon: Icons.privacy_tip,
-            label: 'Privacy and safety',
-            onPressed: () {},
-          ),
+            icon: Icons.info_rounded,
+            label: 'About',
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => About()));
+            },
+          )
         ],
       ),
     );

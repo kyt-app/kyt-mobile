@@ -65,11 +65,16 @@ Future<bool> validateAndUploadData(
 
 class Upload extends StatefulWidget {
   static String id = "upload";
+  String something;
+  Upload(this.something);
   @override
-  _UploadState createState() => _UploadState();
+  _UploadState createState() => _UploadState(this.something);
 }
 
 class _UploadState extends State<Upload> {
+  String something;
+  _UploadState(this.something);
+
   bool validTest;
   String imagePath, testName;
   final user = FirebaseAuth.instance.currentUser;
@@ -77,6 +82,8 @@ class _UploadState extends State<Upload> {
   bool showProgress = false;
   String progressMessage = "";
   var msgController = TextEditingController();
+  String result = "result";
+  bool showResult = false;
 
   @override
   Widget build(BuildContext context) {
@@ -124,40 +131,65 @@ class _UploadState extends State<Upload> {
           ),
           MySpaces.vGapInBetween,
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 38.0),
-            child: TextFormField(
-              controller: msgController,
-              decoration: InputDecoration(
-                counter: Container(),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                hintStyle: Theme.of(context)
-                    .textTheme
-                    .headline6
-                    .copyWith(color: Colors.grey[800]),
-                hintText: 'Test name',
-                fillColor: MyColors.offWhite,
-                focusedBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: MyColors.darkGrey, width: 2.0)),
-              ),
-              validator: (String testName) {
-                return testName.isEmpty ? 'Name is required' : null;
-              },
-              onChanged: (String test) {
-                testName = test;
-              },
-            ),
-          ),
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 38.0),
+              child: something == 'nav'
+                  ? TextFormField(
+                      controller: msgController,
+                      decoration: InputDecoration(
+                        counter: Container(),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        hintStyle: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.grey[800]),
+                        hintText: 'Test name',
+                        fillColor: MyColors.offWhite,
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: MyColors.darkGrey, width: 2.0)),
+                      ),
+                      validator: (String testName) {
+                        return testName.isEmpty ? 'Name is required' : null;
+                      },
+                      onChanged: (String test) {
+                        testName = test;
+                      },
+                    )
+                  : TextFormField(
+                      controller: msgController,
+                      decoration: InputDecoration(
+                        counter: Container(),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        hintStyle: Theme.of(context)
+                            .textTheme
+                            .headline6
+                            .copyWith(color: Colors.grey[800]),
+                        hintText: something,
+                        fillColor: MyColors.offWhite,
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: MyColors.darkGrey, width: 2.0)),
+                      ),
+                      validator: (String testName) {
+                        return testName.isEmpty ? 'Name is required' : null;
+                      },
+                      enabled: false,
+                    )),
           MySpaces.vGapInBetween,
           SettingsRow(
               label: 'Take picture',
               icon: Icons.camera_alt,
               onPressed: () async {
                 if (testName == null) {
-                  return Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          'Please enter the test name before proceeding.')));
+                  if (something == 'nav') {
+                    return Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            'Please enter the test name before proceeding.')));
+                  } else {
+                    testName = something;
+                  }
                 }
                 // get image from camera
                 final imageFromCamera =
@@ -234,9 +266,13 @@ class _UploadState extends State<Upload> {
             icon: Icons.photo,
             onPressed: () async {
               if (testName == null) {
-                return Scaffold.of(context).showSnackBar(SnackBar(
-                    content:
-                        Text('Please enter the test name before proceeding.')));
+                if (something == 'nav') {
+                  return Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'Please enter the test name before proceeding.')));
+                } else {
+                  testName = something;
+                }
               }
               // choose image from gallery
               final imageFromGallery =
@@ -301,14 +337,29 @@ class _UploadState extends State<Upload> {
               // return response to user according to test result
               if (!validTest) {
                 msgController.clear();
-                Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        'The result uploaded is not authentic. You may be ineligible for travel.')));
+                if (something == 'nav') {
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'The result uploaded is not authentic. You may be ineligible for travel.')));
+                } else {
+                  setState(() {
+                    showResult = true;
+                    result =
+                        "The result uploaded is not authentic. You may be ineligible for travel.";
+                  });
+                }
               } else {
                 msgController.clear();
-                Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        'Valid test result uploaded. You\'re good to go!')));
+                if (something == 'nav') {
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'Valid test result uploaded. You\'re good to go!')));
+                } else {
+                  setState(() {
+                    showResult = true;
+                    result = "Valid test result uploaded. You\'re good to go!";
+                  });
+                }
               }
             },
           ),
@@ -331,6 +382,17 @@ class _UploadState extends State<Upload> {
                             ]))
                     : null),
           ),
+          showResult
+              ? Container(
+                  height: 100,
+                  width: double.infinity,
+                  color: MyColors.offWhite,
+                  child: Center(
+                      child: Container(
+                          padding: EdgeInsets.all(16),
+                          color: MyColors.offWhite,
+                          child: Column(children: [Text(result)]))))
+              : SizedBox(width: 0.0)
         ],
       ),
     );
