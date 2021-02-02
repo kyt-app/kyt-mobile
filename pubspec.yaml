@@ -24,6 +24,8 @@ dependencies:
   qr_flutter: ^3.2.0
   intl: ^0.16.1
   firebase_storage: ^7.0.0
+  photo_view: ^0.10.3
+  url_launcher: ^5.7.10
 
 dev_dependencies:
   flutter_test:

@@ -57,10 +57,12 @@ class _SettingsState extends State<Settings> {
                   Text(
                     '${user.displayName}',
                     style: Theme.of(context).textTheme.headline6.copyWith(
-                        color: MyColors.white, fontWeight: FontWeight.bold),
+                        color: MyColors.white, fontWeight: FontWeight.bold
+                    ),
                   )
                 ],
-              )),
+              )
+          ),
           Padding(
             padding: EdgeInsets.only(left: 38.0),
             child: Text(

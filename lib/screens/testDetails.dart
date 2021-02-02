@@ -4,10 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/screens/navigation.dart';
 import 'package:kyt/widgets/card.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<String> getTestDetails(String testName, String email) async {
   final testDetailsEndpoint = Uri.parse(
@@ -93,6 +95,7 @@ class _TestDetails extends State<TestDetails> {
               margin: EdgeInsets.all(30.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Center(
                       child: Ink(
@@ -106,13 +109,16 @@ class _TestDetails extends State<TestDetails> {
                                   ? Icons.check
                                   : Icons.clear,
                               color: Colors.white,
-                              size: 100.0))),
+                              size: 100.0
+                          )
+                      )
+                  ),
                   MySpaces.vGapInBetween,
                   Center(
                     child: Text(details['testName'],
                         style: Theme.of(context)
                             .textTheme
-                            .headline3
+                            .headline4
                             .copyWith(color: MyColors.darkPrimary)),
                   ),
                   MySpaces.vMediumGapInBetween,
@@ -125,7 +131,7 @@ class _TestDetails extends State<TestDetails> {
                   ),
                   MySpaces.vGapInBetween,
                   VerifyCard(
-                    text: DateFormat.yMMMMEEEEd('en_US')
+                    text: DateFormat.MMMMEEEEd('en_US')
                         .format(DateTime.parse(details['timestamp'])),
                   ),
                   MySpaces.vMediumGapInBetween,
@@ -138,12 +144,14 @@ class _TestDetails extends State<TestDetails> {
                   ),
                   MySpaces.vGapInBetween,
                   VerifyCard(
-                    text: '3 days from issuing date',
+                    // keep validity for 3 days after the issuing date
+                    text: !details['testName'].toString().contains('vaccine')
+                        ? '${DateFormat.MMMMEEEEd('en_US').format(DateTime.fromMillisecondsSinceEpoch(DateTime.parse(details['timestamp']).millisecondsSinceEpoch + 259200000))}'
+                        : 'No expiry date'
                   ),
-                  MySpaces.vMediumGapInBetween,
-                  // TODO: add original photo render widget
+                  MySpaces.vLargeGapInBetween,
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       ButtonTheme(
                         minWidth: 100.0,
@@ -166,20 +174,22 @@ class _TestDetails extends State<TestDetails> {
                       ButtonTheme(
                         minWidth: 100.0,
                         child: RaisedButton(
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(6.0))),
-                            padding: EdgeInsets.all(14.0),
-                            color: MyColors.darkPrimary,
-                            child: Text('Original image',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .subtitle1
-                                    .copyWith(color: MyColors.white)),
-                            onPressed: () {
-                              // do something
-                            }),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(6.0))),
+                          padding: EdgeInsets.all(14.0),
+                          color: MyColors.darkPrimary,
+                          child: Text(
+                              'View report',
+                              style: Theme.of(context).textTheme.subtitle1.copyWith(color: MyColors.white)
+                          ),
+                          onPressed: () async {
+                            if (await canLaunch(details['imageUrl'])) {
+                              launch(details['imageUrl']);
+                            } else {
+                              throw 'Couldn\'t launch ${details['imageUrl']}';
+                            }
+                          },
+                        ),
                       ),
                     ],
                   )
