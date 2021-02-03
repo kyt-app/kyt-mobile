@@ -9,6 +9,7 @@ import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/screens/about.dart';
 import 'package:kyt/screens/editProfile.dart';
 import 'package:kyt/screens/login.dart';
+import 'package:kyt/screens/reportABug.dart';
 import 'package:kyt/widgets/settingsRow.dart';
 
 Future<String> getQRCodeLink(String email) async {
@@ -91,11 +92,11 @@ class _SettingsState extends State<Settings> {
             },
           ),
           SettingsRow(
-            icon: Icons.info_rounded,
-            label: 'About',
+            icon: Icons.report,
+            label: 'Report a bug',
             onPressed: () {
               Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => About()));
+                  .push(MaterialPageRoute(builder: (context) => ReportABug()));
             },
           ),
           MySpaces.vGapInBetween,

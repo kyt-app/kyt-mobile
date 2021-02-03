@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
+import 'package:kyt/screens/about.dart';
 import 'package:kyt/screens/home.dart';
 import 'package:kyt/screens/settings.dart';
 import 'package:kyt/screens/qrcode.dart';
@@ -26,7 +27,7 @@ class _NavigationState extends State<Navigation> {
     QRCode(),
     Upload('nav'),
     Settings(),
-    ReportABug()
+    About()
   ];
   List _iconColors = [Colors.white54, Colors.white];
 
@@ -91,7 +92,7 @@ class _NavigationState extends State<Navigation> {
                       },
                       padding: EdgeInsets.only(left: MyDimens.double_60)),
                   IconButton(
-                    icon: Icon(Icons.report,
+                    icon: Icon(Icons.info_rounded,
                         color: _iconColors[fourthIconColorInt]),
                     onPressed: () {
                       setState(() {
@@ -114,6 +115,10 @@ class _NavigationState extends State<Navigation> {
           onPressed: () {
             setState(() {
               pageIndex = 2;
+              firstIconColorInt = 0;
+              secondIconColorInt = 0;
+              thirdIconColorInt = 0;
+              fourthIconColorInt = 0;
             });
           },
           backgroundColor: MyColors.darkPrimary,
@@ -121,6 +126,7 @@ class _NavigationState extends State<Navigation> {
             Icons.add,
             size: 35,
           ),
-        ));
+        )
+    );
   }
 }

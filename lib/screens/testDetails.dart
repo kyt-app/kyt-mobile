@@ -65,13 +65,14 @@ class _TestDetails extends State<TestDetails> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Scaffold(
+                backgroundColor: MyColors.offWhite,
                 appBar: AppBar(
                     backgroundColor: MyColors.darkPrimary,
                     title: Text('Test details')),
                 body: Center(child: CircularProgressIndicator()));
           }
 
-          final details = json.decode(snapshot.data);
+          final details = json.decode(snapshot.data.toString());
 
           return Scaffold(
             backgroundColor: MyColors.offWhite,

@@ -19,6 +19,7 @@ class _AboutState extends State<About> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: MyColors.offWhite,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -33,12 +34,20 @@ class _AboutState extends State<About> {
         body: Container(
             margin: const EdgeInsets.symmetric(
                 horizontal: MyDimens.double_20, vertical: MyDimens.double_20),
-            child: Column(
+            child: ListView(
+              shrinkWrap: true,
               children: [
-                Image.network(
-                  'https://cdn.discordapp.com/attachments/720733621811544165/806287045315919923/77614464-removebg-preview.png',
-                  height: 150.0,
-                  width: 150.0,
+                Center(
+                  child: Image.network(
+                    'https://cdn.discordapp.com/attachments/720733621811544165/806287045315919923/77614464-removebg-preview.png',
+                    height: 150.0,
+                    width: 150.0,
+                  ),
+                ),
+                Text(
+                  'Know Your Traveller',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline4.copyWith(color: MyColors.darkPrimary)
                 ),
                 Text(
                   '\nKYT is a privacy-focused and entrusted intermediary service between travellers and travel service providers, which enables passengers to share the required health records without revealing any other personal information. ',
@@ -63,7 +72,8 @@ class _AboutState extends State<About> {
                     fontWeight: FontWeight.w400,
                     color: MyColors.black,
                   ),
-                )
+                ),
+                MySpaces.vSmallGapInBetween
               ],
             )));
   }
