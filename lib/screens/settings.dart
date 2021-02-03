@@ -1,14 +1,15 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
-import 'package:kyt/widgets/settingsRow.dart';
 import 'package:kyt/screens/about.dart';
 import 'package:kyt/screens/editProfile.dart';
+import 'package:kyt/screens/login.dart';
+import 'package:kyt/widgets/settingsRow.dart';
 
 Future<String> getQRCodeLink(String email) async {
   final qrCodeEndpoint =
@@ -28,7 +29,14 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  FirebaseAuth auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
+
+  Future<void> _signOut() async {
+    await auth.signOut();
+    Navigator.pushNamed(context, Login.id);
+    Scaffold.of(context).showSnackBar(SnackBar(content: Text('Signed out')));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +97,35 @@ class _SettingsState extends State<Settings> {
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (context) => About()));
             },
+          ),
+          MySpaces.vGapInBetween,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                child: ButtonTheme(
+                  minWidth: 100.0,
+                  child: RaisedButton(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(6.0))),
+                    padding: EdgeInsets.all(14.0),
+                    color: MyColors.darkPrimary,
+                    child: Text('Sign out',
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle1
+                            .copyWith(color: MyColors.white)),
+                    onPressed: () {
+                      Scaffold.of(context)
+                          .showSnackBar(SnackBar(content: Text('Signing out')));
+                      _signOut();
+                    },
+                  ),
+                ),
+                padding: EdgeInsets.only(right: 36.0),
+              )
+            ],
           )
         ],
       ),

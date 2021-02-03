@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/screens/navigation.dart';
@@ -112,10 +111,7 @@ class _TestDetails extends State<TestDetails> {
                                   ? Icons.check
                                   : Icons.clear,
                               color: Colors.white,
-                              size: 100.0
-                          )
-                      )
-                  ),
+                              size: 100.0))),
                   MySpaces.vGapInBetween,
                   Center(
                     child: Text(details['testName'],
@@ -147,14 +143,13 @@ class _TestDetails extends State<TestDetails> {
                   ),
                   MySpaces.vGapInBetween,
                   VerifyCard(
-                    // keep validity for 3 days after the issuing date
-                    text: !details['testName'].toString().contains('vaccine')
-                        ? '${DateFormat.MMMMEEEEd('en_US').format(DateTime.fromMillisecondsSinceEpoch(DateTime.parse(details['timestamp']).millisecondsSinceEpoch + 259200000))}'
-                        : 'No expiry date'
-                  ),
-                  MySpaces.vLargeGapInBetween,
+                      // keep validity for 3 days after the issuing date
+                      text: !details['testName'].toString().contains('vaccine')
+                          ? '${DateFormat.MMMMEEEEd('en_US').format(DateTime.fromMillisecondsSinceEpoch(DateTime.parse(details['timestamp']).millisecondsSinceEpoch + 259200000))}'
+                          : 'No expiry date'),
+                  MySpaces.vMediumGapInBetween,
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       details['status'] == 'invalid'
                           ? ButtonTheme(
@@ -184,13 +179,16 @@ class _TestDetails extends State<TestDetails> {
                         minWidth: 100.0,
                         child: RaisedButton(
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(6.0))),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(6.0))),
                           padding: EdgeInsets.all(14.0),
                           color: MyColors.darkPrimary,
-                          child: Text(
-                              'View report',
-                              style: Theme.of(context).textTheme.subtitle1.copyWith(color: MyColors.white)
-                          ),
+                          child: Text('View report',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1
+                                  .copyWith(color: MyColors.white)),
                           onPressed: () async {
                             if (await canLaunch(details['imageUrl'])) {
                               launch(details['imageUrl']);
