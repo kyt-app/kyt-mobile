@@ -8,14 +8,14 @@ import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/widgets/testCard.dart';
 
-Future<String> getUserTests(String email) async {
-  final updateStatusEndpoint =
-      Uri.parse('https://kyt-api.azurewebsites.net/update/status?email=$email');
+Future<String> getUserTests(String authToken) async {
+  final updateStatusEndpoint = Uri.parse(
+      'https://kyt-api.azurewebsites.net/update/status?authToken=$authToken');
   final response = await http.get(updateStatusEndpoint);
   if (response.statusCode == 200) {
     print(response.body);
-    final testsEndpoint =
-        Uri.parse('https://kyt-api.azurewebsites.net/profile?email=$email');
+    final testsEndpoint = Uri.parse(
+        'https://kyt-api.azurewebsites.net/profile?authToken=$authToken');
     final profileResponse = await http.get(testsEndpoint);
 
     if (profileResponse.statusCode == 200) {
@@ -38,7 +38,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getUserTests(user.email),
+        future: getUserTests(user.uid),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Scaffold(

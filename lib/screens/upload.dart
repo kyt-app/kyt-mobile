@@ -42,11 +42,11 @@ Future<String> getTextFromOCR(List<int> imageBytes) async {
 }
 
 Future<bool> validateAndUploadData(
-    String text, String email, String testName, String testImageUrl) async {
+    String text, String authToken, String testName, String testImageUrl) async {
   final String validationEndpoint = 'https://kyt-api.azurewebsites.net/verify';
   final validationResponse =
       await http.post(validationEndpoint, body: <String, String>{
-    'email': email,
+    'authToken': authToken,
     'testName': testName,
     'timestamp': '${DateTime.now()}',
     'text': text,
@@ -63,9 +63,9 @@ Future<bool> validateAndUploadData(
   return false;
 }
 
-Future<bool> testNameCheckIfExists(String testName, String email) async {
+Future<bool> testNameCheckIfExists(String testName, String authToken) async {
   final endpoint = Uri.parse(
-      'https://kyt-api.azurewebsites.net/tests/checktestname?email=$email&testName=$testName');
+      'https://kyt-api.azurewebsites.net/tests/checktestname?authToken=$authToken&testName=$testName');
   final response = await http.get(endpoint);
 
   if (response.statusCode == 200) {
@@ -208,7 +208,7 @@ class _UploadState extends State<Upload> {
 
                 if (something == 'nav') {
                   final testNameExists =
-                      await testNameCheckIfExists(testName, '${user.email}');
+                      await testNameCheckIfExists(testName, '${user.uid}');
                   if (!testNameExists) {
                     // get image from camera
                     final imageFromCamera =
@@ -262,7 +262,7 @@ class _UploadState extends State<Upload> {
 
                     // push data to db and validate test result
                     validTest = await validateAndUploadData(
-                        ocrText, user.email, testName, testImageUrl);
+                        ocrText, user.uid, testName, testImageUrl);
                     setState(() {
                       progressMessage = "Validating";
                     });
@@ -356,7 +356,7 @@ class _UploadState extends State<Upload> {
 
                   // push data to db and validate test result
                   validTest = await validateAndUploadData(
-                      ocrText, user.email, testName, testImageUrl);
+                      ocrText, user.uid, testName, testImageUrl);
                   setState(() {
                     progressMessage = "Validating";
                   });
@@ -411,7 +411,7 @@ class _UploadState extends State<Upload> {
 
               if (something == 'nav') {
                 final testNameExists =
-                    await testNameCheckIfExists(testName, '${user.email}');
+                    await testNameCheckIfExists(testName, '${user.uid}');
                 if (!testNameExists) {
                   // choose image from gallery
                   final imageFromGallery =
@@ -465,7 +465,7 @@ class _UploadState extends State<Upload> {
 
                   // push data to db and validate test result
                   validTest = await validateAndUploadData(
-                      ocrText, user.email, testName, testImageUrl);
+                      ocrText, user.uid, testName, testImageUrl);
                   setState(() {
                     progressMessage = "Validating";
                   });
@@ -559,7 +559,7 @@ class _UploadState extends State<Upload> {
 
                 // push data to db and validate test result
                 validTest = await validateAndUploadData(
-                    ocrText, user.email, testName, testImageUrl);
+                    ocrText, user.uid, testName, testImageUrl);
                 setState(() {
                   progressMessage = "Validating";
                 });

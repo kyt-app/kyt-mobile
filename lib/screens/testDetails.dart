@@ -13,9 +13,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'upload.dart';
 
-Future<String> getTestDetails(String testName, String email) async {
+Future<String> getTestDetails(String testName, String authToken) async {
   final testDetailsEndpoint = Uri.parse(
-      'https://kyt-api.azurewebsites.net/tests/testdetails?email=$email&testName=$testName');
+      'https://kyt-api.azurewebsites.net/tests/testdetails?authToken=$authToken&testName=$testName');
   final response = await http.get(testDetailsEndpoint);
 
   if (response.statusCode == 200) {
@@ -25,13 +25,14 @@ Future<String> getTestDetails(String testName, String email) async {
   return null;
 }
 
-Future<String> deleteTest(String testName, String email) async {
+Future<String> deleteTest(String testName, String authToken) async {
   final http.Response response = await http.post(
     'https://kyt-api.azurewebsites.net/tests/deletetest',
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
-    body: jsonEncode(<String, String>{"email": email, "testName": testName}),
+    body: jsonEncode(
+        <String, String>{"authToken": authToken, "testName": testName}),
   );
 
   if (response.statusCode == 200) {
@@ -61,7 +62,7 @@ class _TestDetails extends State<TestDetails> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getTestDetails(test, user.email),
+        future: getTestDetails(test, user.uid),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Scaffold(
@@ -85,7 +86,7 @@ class _TestDetails extends State<TestDetails> {
                   ),
                   onPressed: () {
                     Future<String> res =
-                        deleteTest(details['testName'], user.email);
+                        deleteTest(details['testName'], user.uid);
                     print(res);
                     Navigator.pushNamed(context, Navigation.id);
                   },

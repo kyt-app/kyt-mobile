@@ -47,6 +47,8 @@ class _RegisterState extends State<Register> {
   int kytNumber;
   List<String> countries = ['India', 'USA'];
   bool showSpinner = false;
+  bool showProgress = false;
+  String progressMessage = "";
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +62,10 @@ class _RegisterState extends State<Register> {
                   child: Center(
                       child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: ListView(
+                      shrinkWrap: true,
                       children: <Widget>[
+                        MySpaces.vSmallGapInBetween,
                         Text(
                           MyStrings.registerForKYT,
                           style: Theme.of(context).textTheme.headline5.copyWith(
@@ -335,7 +337,11 @@ class _RegisterState extends State<Register> {
 
                                         if (_formKey.currentState.validate()) {
                                           FocusScope.of(context).unfocus();
-
+                                          setState(() => {showProgress = true});
+                                          setState(() => {
+                                                progressMessage =
+                                                    'Checking passport number'
+                                              });
                                           final passportExists =
                                               await passportCheckIfExists(
                                                   userPassportNumber);
@@ -347,7 +353,12 @@ class _RegisterState extends State<Register> {
                                                     content: Text(MyStrings
                                                             .registeringLabel +
                                                         userName)));
-
+                                            setState(
+                                                () => {showProgress = true});
+                                            setState(() => {
+                                                  progressMessage =
+                                                      'Registering'
+                                                });
                                             // firebase auth
                                             final newUser = await _auth
                                                 .createUserWithEmailAndPassword(
@@ -413,7 +424,9 @@ class _RegisterState extends State<Register> {
                                                     userPassportNumber,
                                                 'kytNumber':
                                                     kytNumber.toString(),
-                                                'pfpUrl': userPfpUrl
+                                                'pfpUrl': userPfpUrl,
+                                                'authToken':
+                                                    (user.uid).toString()
                                               }),
                                             );
 
@@ -443,7 +456,30 @@ class _RegisterState extends State<Register> {
                                         }
                                       },
                                     ),
-                                    MySpaces.vMediumGapInBetween,
+                                    MySpaces.vSmallGapInBetween,
+                                    showProgress
+                                        ? Container(
+                                            height: 100,
+                                            width: double.infinity,
+                                            color: MyColors.offWhite,
+                                            child: Center(
+                                                // use ternary operator to decide when to show progress indicator
+                                                child: Container(
+                                                    padding: EdgeInsets.all(16),
+                                                    color: MyColors.offWhite,
+                                                    child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          _getLoadingIndicator(),
+                                                          _getText(
+                                                              progressMessage)
+                                                        ]))),
+                                          )
+                                        : MySpaces.vSmallGapInBetween,
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -466,12 +502,30 @@ class _RegisterState extends State<Register> {
                                                     .copyWith(
                                                         color: MyColors.green)))
                                       ],
-                                    )
+                                    ),
+                                    MySpaces.vMediumGapInBetween
                                   ],
                                 )))
                       ],
                     ),
                   )))),
         ));
+  }
+
+  Widget _getLoadingIndicator() {
+    return Padding(
+        child: Container(
+            child: CircularProgressIndicator(strokeWidth: 3),
+            width: 32,
+            height: 32),
+        padding: EdgeInsets.only(bottom: 16));
+  }
+
+  Widget _getText(String displayedText) {
+    return Text(
+      displayedText,
+      style: TextStyle(color: MyColors.darkPrimary, fontSize: 14),
+      textAlign: TextAlign.center,
+    );
   }
 }

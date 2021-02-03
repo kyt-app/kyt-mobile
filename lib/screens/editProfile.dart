@@ -234,7 +234,7 @@ class _EditProfileState extends State<EditProfile> {
                                                   'application/json; charset=UTF-8'
                                             },
                                             body: jsonEncode(<String, String>{
-                                              'email': '${user.email}',
+                                              'authToken': '${user.uid}',
                                               'phoneNumber': phoneNumber,
                                               'pfpUrl': userPfpUrl
                                             }),
