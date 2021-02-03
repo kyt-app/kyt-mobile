@@ -8,6 +8,7 @@ import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/widgets/settingsRow.dart';
 import 'package:kyt/screens/about.dart';
+import 'package:kyt/screens/editProfile.dart';
 
 Future<String> getQRCodeLink(String email) async {
   final qrCodeEndpoint =
@@ -76,7 +77,10 @@ class _SettingsState extends State<Settings> {
           SettingsRow(
             icon: Icons.edit,
             label: 'Edit Profile',
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => EditProfile()));
+            },
           ),
           SettingsRow(
             icon: Icons.info_rounded,

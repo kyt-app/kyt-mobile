@@ -63,6 +63,18 @@ Future<bool> validateAndUploadData(
   return false;
 }
 
+Future<bool> testNameCheckIfExists(String testName, String email) async {
+  final endpoint = Uri.parse(
+      'https://kyt-api.azurewebsites.net/tests/checktestname?email=$email&testName=$testName');
+  final response = await http.get(endpoint);
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body)['boolean'];
+  }
+
+  return null;
+}
+
 class Upload extends StatefulWidget {
   static String id = "upload";
   String something;
@@ -173,7 +185,9 @@ class _UploadState extends State<Upload> {
                                 color: MyColors.darkGrey, width: 2.0)),
                       ),
                       validator: (String testName) {
-                        return testName.isEmpty ? 'Name is required' : null;
+                        if (testName.isEmpty) {
+                          return 'Name is required';
+                        }
                       },
                       enabled: false,
                     )),
@@ -191,75 +205,195 @@ class _UploadState extends State<Upload> {
                     testName = something;
                   }
                 }
-                // get image from camera
-                final imageFromCamera =
-                    await ImagePicker.pickImage(source: ImageSource.camera);
-                print('camera image path: ${imageFromCamera.path}');
 
-                setState(() {
-                  showProgress = true;
-                });
+                if (something == 'nav') {
+                  final testNameExists =
+                      await testNameCheckIfExists(testName, '${user.email}');
+                  if (!testNameExists) {
+                    // get image from camera
+                    final imageFromCamera =
+                        await ImagePicker.pickImage(source: ImageSource.camera);
+                    print('camera image path: ${imageFromCamera.path}');
 
-                // initialize test image url
-                String testImageUrl;
+                    setState(() {
+                      showProgress = true;
+                    });
 
-                // start firebase upload task
-                firebase_storage.UploadTask testImageUploadTask = _storage
-                    .ref(
-                        '${user.email}/tests/${basename(imageFromCamera.path)}')
-                    .putFile(imageFromCamera);
+                    // initialize test image url
+                    String testImageUrl;
 
-                setState(() {
-                  progressMessage = "Uploading to server";
-                });
+                    // start firebase upload task
+                    firebase_storage.UploadTask testImageUploadTask = _storage
+                        .ref(
+                            '${user.email}/tests/${basename(imageFromCamera.path)}')
+                        .putFile(imageFromCamera);
 
-                // push download url of uploaded image to testImageUrl string
-                try {
-                  firebase_storage.TaskSnapshot snapshot =
-                      await testImageUploadTask;
-                  testImageUrl = await _storage
+                    setState(() {
+                      progressMessage = "Uploading to server";
+                    });
+
+                    // push download url of uploaded image to testImageUrl string
+                    try {
+                      firebase_storage.TaskSnapshot snapshot =
+                          await testImageUploadTask;
+                      testImageUrl = await _storage
+                          .ref(
+                              '${user.email}/tests/${basename(imageFromCamera.path)}')
+                          .getDownloadURL();
+                      print('uploaded image url: $testImageUrl');
+                    } catch (e) {
+                      print(testImageUploadTask.snapshot);
+                    }
+
+                    print('starting to read bytes');
+
+                    setState(() {
+                      progressMessage = "Reading bytes";
+                    });
+
+                    // start azure vision ocr task
+                    final imageBytes = imageFromCamera.readAsBytesSync();
+                    setState(() {
+                      progressMessage = "Running OCR";
+                    });
+                    String ocrText = await getTextFromOCR(imageBytes);
+
+                    print('ocr was completed');
+
+                    // push data to db and validate test result
+                    validTest = await validateAndUploadData(
+                        ocrText, user.email, testName, testImageUrl);
+                    setState(() {
+                      progressMessage = "Validating";
+                    });
+                    print('camera intent valid test result: $validTest');
+                    setState(() {
+                      // set the progress indicator to true so it would not be visible
+                      showProgress = false;
+                    });
+                    // return response according to test result
+                    if (!validTest) {
+                      msgController.clear();
+                      if (something == 'nav') {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.')));
+                      } else {
+                        setState(() {
+                          showResult = true;
+                          result =
+                              "The result uploaded is not authentic. You may be ineligible for travel.";
+                        });
+                      }
+                    } else {
+                      msgController.clear();
+                      if (something == 'nav') {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'Valid test result uploaded. You\'re good to go!')));
+                      } else {
+                        setState(() {
+                          showResult = true;
+                          result =
+                              "Valid test result uploaded. You\'re good to go!";
+                        });
+                      }
+                    }
+                  } else {
+                    return Scaffold.of(context).showSnackBar(
+                        SnackBar(content: Text('Test name already exists')));
+                  }
+                } else {
+                  // get image from camera
+                  final imageFromCamera =
+                      await ImagePicker.pickImage(source: ImageSource.camera);
+                  print('camera image path: ${imageFromCamera.path}');
+
+                  setState(() {
+                    showProgress = true;
+                  });
+
+                  // initialize test image url
+                  String testImageUrl;
+
+                  // start firebase upload task
+                  firebase_storage.UploadTask testImageUploadTask = _storage
                       .ref(
                           '${user.email}/tests/${basename(imageFromCamera.path)}')
-                      .getDownloadURL();
-                  print('uploaded image url: $testImageUrl');
-                } catch (e) {
-                  print(testImageUploadTask.snapshot);
+                      .putFile(imageFromCamera);
+
+                  setState(() {
+                    progressMessage = "Uploading to server";
+                  });
+
+                  // push download url of uploaded image to testImageUrl string
+                  try {
+                    firebase_storage.TaskSnapshot snapshot =
+                        await testImageUploadTask;
+                    testImageUrl = await _storage
+                        .ref(
+                            '${user.email}/tests/${basename(imageFromCamera.path)}')
+                        .getDownloadURL();
+                    print('uploaded image url: $testImageUrl');
+                  } catch (e) {
+                    print(testImageUploadTask.snapshot);
+                  }
+
+                  print('starting to read bytes');
+
+                  setState(() {
+                    progressMessage = "Reading bytes";
+                  });
+
+                  // start azure vision ocr task
+                  final imageBytes = imageFromCamera.readAsBytesSync();
+                  setState(() {
+                    progressMessage = "Running OCR";
+                  });
+                  String ocrText = await getTextFromOCR(imageBytes);
+
+                  print('ocr was completed');
+
+                  // push data to db and validate test result
+                  validTest = await validateAndUploadData(
+                      ocrText, user.email, testName, testImageUrl);
+                  setState(() {
+                    progressMessage = "Validating";
+                  });
+                  print('camera intent valid test result: $validTest');
+                  setState(() {
+                    // set the progress indicator to true so it would not be visible
+                    showProgress = false;
+                  });
+                  // return response according to test result
+                  if (!validTest) {
+                    msgController.clear();
+                    if (something == 'nav') {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'The result uploaded is not authentic. You may be ineligible for travel.')));
+                    } else {
+                      setState(() {
+                        showResult = true;
+                        result =
+                            "The result uploaded is not authentic. You may be ineligible for travel.";
+                      });
+                    }
+                  } else {
+                    msgController.clear();
+                    if (something == 'nav') {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!')));
+                    } else {
+                      setState(() {
+                        showResult = true;
+                        result =
+                            "Valid test result uploaded. You\'re good to go!";
+                      });
+                    }
+                  }
                 }
-
-                print('starting to read bytes');
-
-                setState(() {
-                  progressMessage = "Reading bytes";
-                });
-
-                // start azure vision ocr task
-                final imageBytes = imageFromCamera.readAsBytesSync();
-                setState(() {
-                  progressMessage = "Running OCR";
-                });
-                String ocrText = await getTextFromOCR(imageBytes);
-
-                print('ocr was completed');
-
-                // push data to db and validate test result
-                validTest = await validateAndUploadData(
-                    ocrText, user.email, testName, testImageUrl);
-                setState(() {
-                  progressMessage = "Validating";
-                });
-                print('camera intent valid test result: $validTest');
-                setState(() {
-                  // set the progress indicator to true so it would not be visible
-                  showProgress = false;
-                });
-                // return response according to test result
-                !validTest
-                    ? Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            'The result uploaded is not authentic. You may be ineligible for travel.')))
-                    : Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            'Valid test result uploaded. You\'re good to go!')));
               }),
           SettingsRow(
             label: 'Upload from gallery',
@@ -274,91 +408,193 @@ class _UploadState extends State<Upload> {
                   testName = something;
                 }
               }
-              // choose image from gallery
-              final imageFromGallery =
-                  await ImagePicker.pickImage(source: ImageSource.gallery);
-              print('gallery image path: ${imageFromGallery.path}');
 
-              setState(() {
-                showProgress = true;
-              });
+              if (something == 'nav') {
+                final testNameExists =
+                    await testNameCheckIfExists(testName, '${user.email}');
+                if (!testNameExists) {
+                  // choose image from gallery
+                  final imageFromGallery =
+                      await ImagePicker.pickImage(source: ImageSource.gallery);
+                  print('gallery image path: ${imageFromGallery.path}');
 
-              // initialize test image url
-              String testImageUrl;
-
-              // start firebase upload task
-              firebase_storage.UploadTask testImageUploadTask = _storage
-                  .ref('${user.email}/tests/${basename(imageFromGallery.path)}')
-                  .putFile(imageFromGallery);
-
-              setState(() {
-                progressMessage = "Uploading to server";
-              });
-
-              // push download url of uploaded image to testImageUrl string
-              try {
-                firebase_storage.TaskSnapshot snapshot =
-                    await testImageUploadTask;
-                testImageUrl = await _storage
-                    .ref(
-                        '${user.email}/tests/${basename(imageFromGallery.path)}')
-                    .getDownloadURL();
-                print('uploaded image: $testImageUrl');
-              } catch (e) {
-                print(testImageUploadTask.snapshot);
-              }
-
-              print('starting to read bytes');
-
-              setState(() {
-                progressMessage = "Reading bytes";
-              });
-
-              // start azure vision ocr task
-              final imageBytes = imageFromGallery.readAsBytesSync();
-              setState(() {
-                progressMessage = "Running OCR";
-              });
-              String ocrText = await getTextFromOCR(imageBytes);
-
-              print('ocr was completed.');
-
-              // push data to db and validate test result
-              validTest = await validateAndUploadData(
-                  ocrText, user.email, testName, testImageUrl);
-              setState(() {
-                progressMessage = "Validating";
-              });
-              print('gallery intent valid test result: $validTest');
-              setState(() {
-                // set the progress indicator to true so it would not be visible
-                showProgress = false;
-              });
-              // return response to user according to test result
-              if (!validTest) {
-                msgController.clear();
-                if (something == 'nav') {
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          'The result uploaded is not authentic. You may be ineligible for travel.')));
-                } else {
                   setState(() {
-                    showResult = true;
-                    result =
-                        "The result uploaded is not authentic. You may be ineligible for travel.";
+                    showProgress = true;
                   });
+
+                  // initialize test image url
+                  String testImageUrl;
+
+                  // start firebase upload task
+                  firebase_storage.UploadTask testImageUploadTask = _storage
+                      .ref(
+                          '${user.email}/tests/${basename(imageFromGallery.path)}')
+                      .putFile(imageFromGallery);
+
+                  setState(() {
+                    progressMessage = "Uploading to server";
+                  });
+
+                  // push download url of uploaded image to testImageUrl string
+                  try {
+                    firebase_storage.TaskSnapshot snapshot =
+                        await testImageUploadTask;
+                    testImageUrl = await _storage
+                        .ref(
+                            '${user.email}/tests/${basename(imageFromGallery.path)}')
+                        .getDownloadURL();
+                    print('uploaded image: $testImageUrl');
+                  } catch (e) {
+                    print(testImageUploadTask.snapshot);
+                  }
+
+                  print('starting to read bytes');
+
+                  setState(() {
+                    progressMessage = "Reading bytes";
+                  });
+
+                  // start azure vision ocr task
+                  final imageBytes = imageFromGallery.readAsBytesSync();
+                  setState(() {
+                    progressMessage = "Running OCR";
+                  });
+                  String ocrText = await getTextFromOCR(imageBytes);
+
+                  print('ocr was completed.');
+
+                  // push data to db and validate test result
+                  validTest = await validateAndUploadData(
+                      ocrText, user.email, testName, testImageUrl);
+                  setState(() {
+                    progressMessage = "Validating";
+                  });
+                  print('gallery intent valid test result: $validTest');
+                  setState(() {
+                    // set the progress indicator to true so it would not be visible
+                    showProgress = false;
+                  });
+                  // return response to user according to test result
+                  if (!validTest) {
+                    msgController.clear();
+                    if (something == 'nav') {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'The result uploaded is not authentic. You may be ineligible for travel.')));
+                    } else {
+                      setState(() {
+                        showResult = true;
+                        result =
+                            "The result uploaded is not authentic. You may be ineligible for travel.";
+                      });
+                    }
+                  } else {
+                    msgController.clear();
+                    if (something == 'nav') {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!')));
+                    } else {
+                      setState(() {
+                        showResult = true;
+                        result =
+                            "Valid test result uploaded. You\'re good to go!";
+                      });
+                    }
+                  }
+                } else {
+                  return Scaffold.of(context).showSnackBar(
+                      SnackBar(content: Text('Test name already exists')));
                 }
               } else {
-                msgController.clear();
-                if (something == 'nav') {
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          'Valid test result uploaded. You\'re good to go!')));
+                // choose image from gallery
+                final imageFromGallery =
+                    await ImagePicker.pickImage(source: ImageSource.gallery);
+                print('gallery image path: ${imageFromGallery.path}');
+
+                setState(() {
+                  showProgress = true;
+                });
+
+                // initialize test image url
+                String testImageUrl;
+
+                // start firebase upload task
+                firebase_storage.UploadTask testImageUploadTask = _storage
+                    .ref(
+                        '${user.email}/tests/${basename(imageFromGallery.path)}')
+                    .putFile(imageFromGallery);
+
+                setState(() {
+                  progressMessage = "Uploading to server";
+                });
+
+                // push download url of uploaded image to testImageUrl string
+                try {
+                  firebase_storage.TaskSnapshot snapshot =
+                      await testImageUploadTask;
+                  testImageUrl = await _storage
+                      .ref(
+                          '${user.email}/tests/${basename(imageFromGallery.path)}')
+                      .getDownloadURL();
+                  print('uploaded image: $testImageUrl');
+                } catch (e) {
+                  print(testImageUploadTask.snapshot);
+                }
+
+                print('starting to read bytes');
+
+                setState(() {
+                  progressMessage = "Reading bytes";
+                });
+
+                // start azure vision ocr task
+                final imageBytes = imageFromGallery.readAsBytesSync();
+                setState(() {
+                  progressMessage = "Running OCR";
+                });
+                String ocrText = await getTextFromOCR(imageBytes);
+
+                print('ocr was completed.');
+
+                // push data to db and validate test result
+                validTest = await validateAndUploadData(
+                    ocrText, user.email, testName, testImageUrl);
+                setState(() {
+                  progressMessage = "Validating";
+                });
+                print('gallery intent valid test result: $validTest');
+                setState(() {
+                  // set the progress indicator to true so it would not be visible
+                  showProgress = false;
+                });
+                // return response to user according to test result
+                if (!validTest) {
+                  msgController.clear();
+                  if (something == 'nav') {
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            'The result uploaded is not authentic. You may be ineligible for travel.')));
+                  } else {
+                    setState(() {
+                      showResult = true;
+                      result =
+                          "The result uploaded is not authentic. You may be ineligible for travel.";
+                    });
+                  }
                 } else {
-                  setState(() {
-                    showResult = true;
-                    result = "Valid test result uploaded. You\'re good to go!";
-                  });
+                  msgController.clear();
+                  if (something == 'nav') {
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            'Valid test result uploaded. You\'re good to go!')));
+                  } else {
+                    setState(() {
+                      showResult = true;
+                      result =
+                          "Valid test result uploaded. You\'re good to go!";
+                    });
+                  }
                 }
               }
             },
