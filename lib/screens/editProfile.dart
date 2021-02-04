@@ -25,6 +25,7 @@ class _EditProfileState extends State<EditProfile> {
   final user = FirebaseAuth.instance.currentUser;
   bool showSpinner = false;
   bool showMessage = false;
+  bool indicator = false;
   String message = "";
   String userName, userEmail, userPfpPath, userPfpUrl, phoneNumber;
 
@@ -165,7 +166,10 @@ class _EditProfileState extends State<EditProfile> {
                                                 source: ImageSource.gallery);
                                         userPfpPath = pfpImage.path;
                                         setState(() => {showMessage = true});
-                                        setState(() => {message = "PFP saved"});
+                                        setState(() => {
+                                              message =
+                                                  "Save profile to apply PFP change"
+                                            });
                                       },
                                     ),
                                     MySpaces.vSmallGapInBetween,
@@ -195,6 +199,11 @@ class _EditProfileState extends State<EditProfile> {
                                           FocusScope.of(context).unfocus();
 
                                           if (userPfpPath != null) {
+                                            setState(
+                                                () => {showMessage = true});
+                                            setState(() => {indicator = true});
+                                            setState(() =>
+                                                {message = "Saving profile"});
                                             final File userPfp =
                                                 File(userPfpPath);
                                             firebase_storage.UploadTask
@@ -242,6 +251,7 @@ class _EditProfileState extends State<EditProfile> {
 
                                           if (response.statusCode == 200) {
                                             print('profile updated');
+                                            setState(() => {indicator = false});
                                             setState(() => {
                                                   message =
                                                       "Profile updated successfully"
@@ -251,7 +261,7 @@ class _EditProfileState extends State<EditProfile> {
                                       },
                                     ),
                                     Container(
-                                        height: 100,
+                                        height: 110,
                                         width: double.infinity,
                                         color: MyColors.offWhite,
                                         child: Center(
@@ -260,7 +270,15 @@ class _EditProfileState extends State<EditProfile> {
                                                 color: MyColors.offWhite,
                                                 child: Column(children: [
                                                   showMessage
-                                                      ? Text(message)
+                                                      ? Column(children: [
+                                                          indicator
+                                                              ? CircularProgressIndicator()
+                                                              : MySpaces
+                                                                  .vSmallGapInBetween,
+                                                          MySpaces
+                                                              .vSmallGapInBetween,
+                                                          Text(message)
+                                                        ])
                                                       : SizedBox(width: 0.0)
                                                 ]))))
                                   ],

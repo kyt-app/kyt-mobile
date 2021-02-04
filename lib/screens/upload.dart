@@ -260,12 +260,14 @@ class _UploadState extends State<Upload> {
 
                     print('ocr was completed');
 
-                    // push data to db and validate test result
-                    validTest = await validateAndUploadData(
-                        ocrText, user.uid, testName, testImageUrl);
                     setState(() {
                       progressMessage = "Validating";
                     });
+
+                    // push data to db and validate test result
+                    validTest = await validateAndUploadData(
+                        ocrText, user.uid, testName, testImageUrl);
+
                     print('camera intent valid test result: $validTest');
                     setState(() {
                       // set the progress indicator to true so it would not be visible
@@ -279,11 +281,10 @@ class _UploadState extends State<Upload> {
                             content: Text(
                                 'The result uploaded is not authentic. You may be ineligible for travel.')));
                       } else {
-                        setState(() {
-                          showResult = true;
-                          result =
-                              "The result uploaded is not authentic. You may be ineligible for travel.";
-                        });
+                        var snackBar = SnackBar(
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     } else {
                       msgController.clear();
@@ -292,11 +293,10 @@ class _UploadState extends State<Upload> {
                             content: Text(
                                 'Valid test result uploaded. You\'re good to go!')));
                       } else {
-                        setState(() {
-                          showResult = true;
-                          result =
-                              "Valid test result uploaded. You\'re good to go!";
-                        });
+                        var snackBar = SnackBar(
+                            content: Text(
+                                'Valid test result uploaded. You\'re good to go!'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     }
                   } else {
@@ -354,12 +354,14 @@ class _UploadState extends State<Upload> {
 
                   print('ocr was completed');
 
-                  // push data to db and validate test result
-                  validTest = await validateAndUploadData(
-                      ocrText, user.uid, testName, testImageUrl);
                   setState(() {
                     progressMessage = "Validating";
                   });
+
+                  // push data to db and validate test result
+                  validTest = await validateAndUploadData(
+                      ocrText, user.uid, testName, testImageUrl);
+
                   print('camera intent valid test result: $validTest');
                   setState(() {
                     // set the progress indicator to true so it would not be visible
@@ -373,11 +375,10 @@ class _UploadState extends State<Upload> {
                           content: Text(
                               'The result uploaded is not authentic. You may be ineligible for travel.')));
                     } else {
-                      setState(() {
-                        showResult = true;
-                        result =
-                            "The result uploaded is not authentic. You may be ineligible for travel.";
-                      });
+                      var snackBar = SnackBar(
+                          content: Text(
+                              'The result uploaded is not authentic. You may be ineligible for travel.'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                   } else {
                     msgController.clear();
@@ -386,11 +387,10 @@ class _UploadState extends State<Upload> {
                           content: Text(
                               'Valid test result uploaded. You\'re good to go!')));
                     } else {
-                      setState(() {
-                        showResult = true;
-                        result =
-                            "Valid test result uploaded. You\'re good to go!";
-                      });
+                      var snackBar = SnackBar(
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                   }
                 }
@@ -463,12 +463,14 @@ class _UploadState extends State<Upload> {
 
                   print('ocr was completed.');
 
-                  // push data to db and validate test result
-                  validTest = await validateAndUploadData(
-                      ocrText, user.uid, testName, testImageUrl);
                   setState(() {
                     progressMessage = "Validating";
                   });
+
+                  // push data to db and validate test result
+                  validTest = await validateAndUploadData(
+                      ocrText, user.uid, testName, testImageUrl);
+
                   print('gallery intent valid test result: $validTest');
                   setState(() {
                     // set the progress indicator to true so it would not be visible
@@ -482,11 +484,10 @@ class _UploadState extends State<Upload> {
                           content: Text(
                               'The result uploaded is not authentic. You may be ineligible for travel.')));
                     } else {
-                      setState(() {
-                        showResult = true;
-                        result =
-                            "The result uploaded is not authentic. You may be ineligible for travel.";
-                      });
+                      var snackBar = SnackBar(
+                          content: Text(
+                              'The result uploaded is not authentic. You may be ineligible for travel.'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                   } else {
                     msgController.clear();
@@ -495,11 +496,10 @@ class _UploadState extends State<Upload> {
                           content: Text(
                               'Valid test result uploaded. You\'re good to go!')));
                     } else {
-                      setState(() {
-                        showResult = true;
-                        result =
-                            "Valid test result uploaded. You\'re good to go!";
-                      });
+                      var snackBar = SnackBar(
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                   }
                 } else {
@@ -557,12 +557,14 @@ class _UploadState extends State<Upload> {
 
                 print('ocr was completed.');
 
-                // push data to db and validate test result
-                validTest = await validateAndUploadData(
-                    ocrText, user.uid, testName, testImageUrl);
                 setState(() {
                   progressMessage = "Validating";
                 });
+
+                // push data to db and validate test result
+                validTest = await validateAndUploadData(
+                    ocrText, user.uid, testName, testImageUrl);
+
                 print('gallery intent valid test result: $validTest');
                 setState(() {
                   // set the progress indicator to true so it would not be visible
@@ -576,11 +578,10 @@ class _UploadState extends State<Upload> {
                         content: Text(
                             'The result uploaded is not authentic. You may be ineligible for travel.')));
                   } else {
-                    setState(() {
-                      showResult = true;
-                      result =
-                          "The result uploaded is not authentic. You may be ineligible for travel.";
-                    });
+                    var snackBar = SnackBar(
+                        content: Text(
+                            'The result uploaded is not authentic. You may be ineligible for travel.'));
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                 } else {
                   msgController.clear();
@@ -589,11 +590,10 @@ class _UploadState extends State<Upload> {
                         content: Text(
                             'Valid test result uploaded. You\'re good to go!')));
                   } else {
-                    setState(() {
-                      showResult = true;
-                      result =
-                          "Valid test result uploaded. You\'re good to go!";
-                    });
+                    var snackBar = SnackBar(
+                        content: Text(
+                            'Valid test result uploaded. You\'re good to go!'));
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                 }
               }
