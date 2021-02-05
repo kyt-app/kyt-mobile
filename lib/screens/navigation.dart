@@ -3,11 +3,9 @@ import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/screens/about.dart';
 import 'package:kyt/screens/home.dart';
-import 'package:kyt/screens/settings.dart';
 import 'package:kyt/screens/qrcode.dart';
-import 'package:kyt/screens/reportABug.dart';
+import 'package:kyt/screens/settings.dart';
 import 'package:kyt/screens/upload.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class Navigation extends StatefulWidget {
   static String id = "navigation";
@@ -22,13 +20,7 @@ class _NavigationState extends State<Navigation> {
   int secondIconColorInt = 0;
   int thirdIconColorInt = 0;
   int fourthIconColorInt = 0;
-  List _currentPage = [
-    Home(),
-    QRCode(),
-    Upload('nav'),
-    Settings(),
-    About()
-  ];
+  List _currentPage = [Home(), QRCode(), Upload('nav'), Settings(), About()];
   List _iconColors = [Colors.white54, Colors.white];
 
   @override
@@ -126,7 +118,6 @@ class _NavigationState extends State<Navigation> {
             Icons.add,
             size: 35,
           ),
-        )
-    );
+        ));
   }
 }

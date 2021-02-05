@@ -71,8 +71,10 @@ class _LoginState extends State<Login> {
                                 ),
                                 validator: (String email) {
                                   if (userEmail.isEmpty) {
-                                    Scaffold.of(context).showSnackBar(SnackBar(
-                                        content: Text(MyStrings.emailError)));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content:
+                                                Text(MyStrings.emailError)));
                                     setState(() {
                                       showSpinner = false;
                                     });
@@ -107,8 +109,8 @@ class _LoginState extends State<Login> {
                                   ),
                                   validator: (String password) {
                                     if (userPassword.isEmpty) {
-                                      Scaffold.of(context).showSnackBar(
-                                          SnackBar(
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
                                               content: Text(MyStrings
                                                   .passwordRequiredError)));
                                       setState(() {
@@ -143,15 +145,15 @@ class _LoginState extends State<Login> {
                                               email: userEmail,
                                               password: userPassword);
                                       if (user != null) {
-                                        Scaffold.of(context).showSnackBar(
-                                            SnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
                                                 content: Text(
                                                     MyStrings.loggingInLabel)));
                                         Navigator.pushNamed(
                                             context, Navigation.id);
                                       } else {
-                                        Scaffold.of(context).showSnackBar(
-                                            SnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
                                                 content: Text(MyStrings
                                                     .incorrectPasswordError)));
                                       }
@@ -161,9 +163,10 @@ class _LoginState extends State<Login> {
                                     }
                                   } catch (e) {
                                     print(e);
-                                    Scaffold.of(context).showSnackBar(SnackBar(
-                                        content: Text(MyStrings
-                                            .somethingWentWrongError)));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(MyStrings
+                                                .somethingWentWrongError)));
                                     setState(() {
                                       showSpinner = false;
                                     });

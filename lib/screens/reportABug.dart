@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kyt/global/myColors.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:kyt/global/myColors.dart';
 
 class ReportABug extends StatefulWidget {
   static String id = "reportABug";
@@ -9,7 +9,6 @@ class ReportABug extends StatefulWidget {
 }
 
 class _ReportABugState extends State<ReportABug> {
-  static final String id = "report";
   final String url =
       'https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAMAADGaV1RUQlRDWkc1V1BHRDBVRjkxSkk1REtEREI2NS4u';
   InAppWebViewController _webViewController;

@@ -6,10 +6,11 @@ class SettingsRow extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  SettingsRow({@required this.label, @required this.icon, @required this.onPressed});
+  SettingsRow(
+      {@required this.label, @required this.icon, @required this.onPressed});
 
-  bool validTest;
-  String imagePath, testName;
+  static bool validTest;
+  static String imagePath, testName;
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +27,11 @@ class SettingsRow extends StatelessWidget {
             padding: EdgeInsets.all(6.0),
             child: ListTile(
               trailing: Icon(icon),
-              title: Text(
-                  label,
+              title: Text(label,
                   style: Theme.of(context).textTheme.headline6.copyWith(
                       color: MyColors.darkPrimary,
-                      fontWeight: FontWeight.bold)
-              ),
-            )
-        ),
+                      fontWeight: FontWeight.bold)),
+            )),
       ),
     );
   }

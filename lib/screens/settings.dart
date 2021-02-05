@@ -4,13 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:kyt/global/myColors.dart';
-import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
-import 'package:kyt/screens/about.dart';
 import 'package:kyt/screens/editProfile.dart';
 import 'package:kyt/screens/login.dart';
 import 'package:kyt/screens/reportABug.dart';
 import 'package:kyt/widgets/settingsRow.dart';
+import 'package:kyt/widgets/userPictureAndName.dart';
 
 Future<String> getQRCodeLink(String email) async {
   final qrCodeEndpoint =
@@ -36,7 +35,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _signOut() async {
     await auth.signOut();
     Navigator.pushNamed(context, Login.id);
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text('Signed out')));
+    // TODO: Add a toast or something because snackbar won't work
   }
 
   @override
@@ -47,31 +46,8 @@ class _SettingsState extends State<Settings> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-              margin: EdgeInsets.only(bottom: MyDimens.double_30),
-              color: MyColors.darkPrimary,
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.3,
-              padding: EdgeInsets.all(MyDimens.double_40),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(MyDimens.double_200),
-                    child: Image.network(
-                      '${user.photoURL}',
-                      height: 100.0,
-                      width: 100.0,
-                    ),
-                  ),
-                  MySpaces.vGapInBetween,
-                  Text(
-                    '${user.displayName}',
-                    style: Theme.of(context).textTheme.headline6.copyWith(
-                        color: MyColors.white, fontWeight: FontWeight.bold),
-                  )
-                ],
-              )),
+          UserPictureAndName(user: user),
+          MySpaces.vMediumGapInBetween,
           Padding(
             padding: EdgeInsets.only(left: 38.0),
             child: Text(
@@ -118,8 +94,8 @@ class _SettingsState extends State<Settings> {
                             .subtitle1
                             .copyWith(color: MyColors.white)),
                     onPressed: () {
-                      Scaffold.of(context)
-                          .showSnackBar(SnackBar(content: Text('Signing out')));
+                      var snackBar = SnackBar(content: Text('Signing out'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       _signOut();
                     },
                   ),

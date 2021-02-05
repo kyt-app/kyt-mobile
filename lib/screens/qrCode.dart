@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kyt/global/myColors.dart';
-import 'package:kyt/global/myDimens.dart';
-import 'package:kyt/global/mySpaces.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:kyt/global/myColors.dart';
+import 'package:kyt/global/mySpaces.dart';
+import 'package:kyt/widgets/userPictureAndName.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 Future<String> getQRCodeLink(String authToken) async {
   final qrCodeEndpoint = Uri.parse(
@@ -47,42 +47,17 @@ class _QRCodeState extends State<QRCode> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Container(
-                      margin: EdgeInsets.only(bottom: MyDimens.double_30),
-                      color: MyColors.darkPrimary,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(MyDimens.double_200),
-                            child: Image.network(
-                              '${user.photoURL}',
-                              height: 100.0,
-                              width: 100.0,
-                            ),
-                          ),
-                          MySpaces.vGapInBetween,
-                          Text(
-                            '${user.displayName}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6
-                                .copyWith(
-                                    color: MyColors.white,
-                                    fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      )),
+                  UserPictureAndName(
+                    user: user,
+                  ),
+                  MySpaces.vSmallGapInBetween,
                   QrImage(
                     data: snapshot.data,
                     version: QrVersions.auto,
                     size: 250.0,
                     foregroundColor: MyColors.darkPrimary,
                   ),
-                  MySpaces.vGapInBetween,
+                  MySpaces.vMediumGapInBetween,
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

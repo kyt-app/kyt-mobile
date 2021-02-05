@@ -1,114 +1,32 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ui';
-import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kyt/functions/getOCRLink.dart';
+import 'package:kyt/functions/getTextFromOCR.dart';
+import 'package:kyt/functions/testNameCheckIfExists.dart';
+import 'package:kyt/functions/validateAndUploadData.dart';
 import 'package:kyt/global/myColors.dart';
-import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
-import 'package:kyt/screens/navigation.dart';
+import 'package:kyt/widgets/userPictureAndName.dart';
 import 'package:path/path.dart';
+
 import '../widgets/settingsRow.dart';
-
-Future<String> getOCRLink(List<int> imageBytes) async {
-  final ocrEndpoint = Uri.parse(
-      'https://kyt-app-ocr.cognitiveservices.azure.com/vision/v3.2-preview.1/read/analyze');
-  final readImageLink = await http.post(ocrEndpoint,
-      headers: <String, String>{
-        'Ocp-Apim-Subscription-Key': 'b583a5bb13ff448399982684386e48ac',
-        'Content-Type': 'application/octet-stream'
-      },
-      body: imageBytes);
-
-  String resultsEndpoint = '';
-
-  if (readImageLink.statusCode == 202) {
-    Map<String, String> link = readImageLink.headers;
-    resultsEndpoint = link['operation-location'];
-    print(resultsEndpoint);
-  }
-
-  return resultsEndpoint;
-}
-
-Future<String> getTextFromOCR(String endpoint) async {
-  String ocrText = '';
-
-  final resultsResponse = await http.get(
-      endpoint,
-      headers: <String, String> {
-        'Ocp-Apim-Subscription-Key': 'b583a5bb13ff448399982684386e48ac'
-      }
-  );
-
-  if (resultsResponse.statusCode == 200) {
-    print(resultsResponse.body);
-    Map<String, dynamic> responseMap = json.decode(resultsResponse.body);
-
-    for (var region in responseMap['analyzeResult']['readResults']) {
-      for (var lines in region['lines']) {
-        for (var words in lines['words']) {
-          ocrText += words['text'] + ' ';
-        }
-      }
-    }
-  }
-
-  print(ocrText);
-
-  return ocrText;
-}
-
-Future<bool> validateAndUploadData(
-    String text, String authToken, String testName, String testImageUrl) async {
-  final String validationEndpoint = 'https://kyt-api.azurewebsites.net/verify';
-  final validationResponse =
-      await http.post(validationEndpoint, body: <String, String>{
-    'authToken': authToken,
-    'testName': testName,
-    'timestamp': '${DateTime.now()}',
-    'text': text,
-    'imageUrl': testImageUrl
-  });
-
-  if (validationResponse.statusCode == 200) {
-    bool valid = json.decode(validationResponse.body)['boolean'];
-    return valid;
-  }
-
-  print('nothing happened thus returning false');
-  // return error in validating
-  return false;
-}
-
-Future<bool> testNameCheckIfExists(String testName, String authToken) async {
-  final endpoint = Uri.parse(
-      'https://kyt-api.azurewebsites.net/tests/checktestname?authToken=$authToken&testName=$testName');
-  final response = await http.get(endpoint);
-
-  if (response.statusCode == 200) {
-    return json.decode(response.body)['boolean'];
-  }
-
-  return null;
-}
 
 class Upload extends StatefulWidget {
   static String id = "upload";
-  String something;
+  final String something;
   Upload(this.something);
   @override
   _UploadState createState() => _UploadState(this.something);
 }
 
 class _UploadState extends State<Upload> {
-  String something;
-  _UploadState(this.something);
+  String testNameContext;
+  _UploadState(this.testNameContext);
 
   bool validTest;
   String imagePath, testName;
@@ -129,31 +47,8 @@ class _UploadState extends State<Upload> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-              margin: EdgeInsets.only(bottom: MyDimens.double_30),
-              color: MyColors.darkPrimary,
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.3,
-              padding: EdgeInsets.all(MyDimens.double_40),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(MyDimens.double_200),
-                    child: Image.network(
-                      '${user.photoURL}',
-                      height: 100.0,
-                      width: 100.0,
-                    ),
-                  ),
-                  MySpaces.vGapInBetween,
-                  Text(
-                    '${user.displayName}',
-                    style: Theme.of(context).textTheme.headline6.copyWith(
-                        color: MyColors.white, fontWeight: FontWeight.bold),
-                  )
-                ],
-              )),
+          UserPictureAndName(user: user),
+          MySpaces.vMediumGapInBetween,
           Padding(
             padding: EdgeInsets.only(left: 38.0),
             child: Text(
@@ -166,73 +61,46 @@ class _UploadState extends State<Upload> {
           ),
           MySpaces.vGapInBetween,
           Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 38.0),
-              child: something == 'nav'
-                  ? TextFormField(
-                      controller: msgController,
-                      decoration: InputDecoration(
-                        counter: Container(),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                        hintStyle: Theme.of(context)
-                            .textTheme
-                            .headline6
-                            .copyWith(color: Colors.grey[800]),
-                        hintText: 'Test name',
-                        fillColor: MyColors.offWhite,
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: MyColors.darkGrey, width: 2.0)),
-                      ),
-                      validator: (String testName) {
-                        return testName.isEmpty ? 'Name is required' : null;
-                      },
-                      onChanged: (String test) {
-                        testName = test;
-                      },
-                    )
-                  : TextFormField(
-                      controller: msgController,
-                      decoration: InputDecoration(
-                        counter: Container(),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                        hintStyle: Theme.of(context)
-                            .textTheme
-                            .headline6
-                            .copyWith(color: Colors.grey[800]),
-                        hintText: something,
-                        fillColor: MyColors.offWhite,
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: MyColors.darkGrey, width: 2.0)),
-                      ),
-                      validator: (String testName) {
-                        return testName.isEmpty ? 'Test name is required' : null;
-                      },
-                      enabled: false,
-                    )),
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 38.0),
+            child: testNameContext == 'nav'
+                ? TestNameTextFormField(
+                    messageController: msgController,
+                    hintText: 'Test name',
+                    onChanged: (String test) {
+                      testName = test;
+                    },
+                  )
+                : TestNameTextFormField(
+                    messageController: msgController,
+                    hintText: testNameContext,
+                    isEnabled: false,
+                  ),
+          ),
           MySpaces.vGapInBetween,
           SettingsRow(
               label: 'Take picture',
               icon: Icons.camera_alt,
               onPressed: () async {
                 if (testName == null) {
-                  if (something == 'nav') {
-                    return Scaffold.of(context).showSnackBar(SnackBar(
+                  if (testNameContext == 'nav') {
+                    return ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
                         content: Text(
-                            'Please enter the test name before proceeding.')));
+                            'Please enter the test name before proceeding.'),
+                      ),
+                    );
                   } else {
-                    testName = something;
+                    testName = testNameContext;
                   }
                 }
 
-                if (something == 'nav') {
+                if (testNameContext == 'nav') {
                   final testNameExists =
                       await testNameCheckIfExists(testName, '${user.uid}');
                   if (!testNameExists) {
                     // get image from camera
                     final imageFromCamera =
+                        // ignore: deprecated_member_use
                         await ImagePicker.pickImage(source: ImageSource.camera);
                     print('camera image path: ${imageFromCamera.path}');
 
@@ -255,14 +123,14 @@ class _UploadState extends State<Upload> {
 
                     // push download url of uploaded image to testImageUrl string
                     try {
-                      firebase_storage.TaskSnapshot snapshot =
-                          await testImageUploadTask;
                       testImageUrl = await _storage
                           .ref(
                               '${user.email}/tests/${basename(imageFromCamera.path)}')
                           .getDownloadURL();
                       print('uploaded image url: $testImageUrl');
                     } catch (e) {
+                      firebase_storage.TaskSnapshot snapshot =
+                          await testImageUploadTask;
                       print(testImageUploadTask.snapshot);
                     }
 
@@ -302,22 +170,28 @@ class _UploadState extends State<Upload> {
                       // return response according to test result
                       if (!validTest) {
                         msgController.clear();
-                        if (something == 'nav') {
-                          Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  'The result uploaded is not authentic. You may be ineligible for travel.')));
+                        if (testNameContext == 'nav') {
+                          var snackBar = SnackBar(
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.'),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         } else {
                           var snackBar = SnackBar(
-                              content: Text(
-                                  'The result uploaded is not authentic. You may be ineligible for travel.'));
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.'),
+                          );
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
                       } else {
                         msgController.clear();
-                        if (something == 'nav') {
-                          Scaffold.of(context).showSnackBar(SnackBar(
+                        if (testNameContext == 'nav') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
                               content: Text(
-                                  'Valid test result uploaded. You\'re good to go!')));
+                                  'Valid test result uploaded. You\'re good to go!'),
+                            ),
+                          );
                         } else {
                           var snackBar = SnackBar(
                               content: Text(
@@ -326,14 +200,17 @@ class _UploadState extends State<Upload> {
                         }
                       }
                     });
-
                   } else {
-                    return Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text('Test name already exists')));
+                    return ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Test name already exists'),
+                      ),
+                    );
                   }
                 } else {
                   // get image from camera
                   final imageFromCamera =
+                      // ignore: deprecated_member_use
                       await ImagePicker.pickImage(source: ImageSource.camera);
                   print('camera image path: ${imageFromCamera.path}');
 
@@ -364,6 +241,8 @@ class _UploadState extends State<Upload> {
                         .getDownloadURL();
                     print('uploaded image url: $testImageUrl');
                   } catch (e) {
+                    firebase_storage.TaskSnapshot snapshot =
+                        await testImageUploadTask;
                     print(testImageUploadTask.snapshot);
                   }
 
@@ -403,10 +282,13 @@ class _UploadState extends State<Upload> {
                     // return response according to test result
                     if (!validTest) {
                       msgController.clear();
-                      if (something == 'nav') {
-                        Scaffold.of(context).showSnackBar(SnackBar(
+                      if (testNameContext == 'nav') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
                             content: Text(
-                                'The result uploaded is not authentic. You may be ineligible for travel.')));
+                                'The result uploaded is not authentic. You may be ineligible for travel.'),
+                          ),
+                        );
                       } else {
                         var snackBar = SnackBar(
                             content: Text(
@@ -415,19 +297,21 @@ class _UploadState extends State<Upload> {
                       }
                     } else {
                       msgController.clear();
-                      if (something == 'nav') {
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                                'Valid test result uploaded. You\'re good to go!')));
+                      if (testNameContext == 'nav') {
+                        var snackBar = SnackBar(
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!'),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       } else {
                         var snackBar = SnackBar(
-                            content: Text(
-                                'Valid test result uploaded. You\'re good to go!'));
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!'),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     }
                   });
-
                 }
               }),
           SettingsRow(
@@ -435,22 +319,26 @@ class _UploadState extends State<Upload> {
             icon: Icons.photo,
             onPressed: () async {
               if (testName == null) {
-                if (something == 'nav') {
-                  return Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          'Please enter the test name before proceeding.')));
+                if (testNameContext == 'nav') {
+                  return ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text('Please enter the test name before proceeding.'),
+                    ),
+                  );
                 } else {
-                  testName = something;
+                  testName = testNameContext;
                 }
               }
 
-              if (something == 'nav') {
+              if (testNameContext == 'nav') {
                 final testNameExists =
                     await testNameCheckIfExists(testName, '${user.uid}');
                 if (!testNameExists) {
                   // choose image from gallery
                   final imageFromGallery =
-                  await ImagePicker.pickImage(source: ImageSource.gallery);
+                      // ignore: deprecated_member_use
+                      await ImagePicker.pickImage(source: ImageSource.gallery);
                   print('gallery image path: ${imageFromGallery.path}');
 
                   setState(() {
@@ -463,7 +351,7 @@ class _UploadState extends State<Upload> {
                   // start firebase upload task
                   firebase_storage.UploadTask testImageUploadTask = _storage
                       .ref(
-                      '${user.email}/tests/${basename(imageFromGallery.path)}')
+                          '${user.email}/tests/${basename(imageFromGallery.path)}')
                       .putFile(imageFromGallery);
 
                   setState(() {
@@ -472,15 +360,14 @@ class _UploadState extends State<Upload> {
 
                   // push download url of uploaded image to testImageUrl string
                   try {
-                    firebase_storage.TaskSnapshot snapshot =
-                    await testImageUploadTask;
                     testImageUrl = await _storage
                         .ref(
-                        '${user.email}/tests/${basename(
-                            imageFromGallery.path)}')
+                            '${user.email}/tests/${basename(imageFromGallery.path)}')
                         .getDownloadURL();
                     print('uploaded image: $testImageUrl');
                   } catch (e) {
+                    firebase_storage.TaskSnapshot snapshot =
+                        await testImageUploadTask;
                     print(testImageUploadTask.snapshot);
                   }
 
@@ -520,22 +407,29 @@ class _UploadState extends State<Upload> {
                     // return response to user according to test result
                     if (!validTest) {
                       msgController.clear();
-                      if (something == 'nav') {
-                        Scaffold.of(context).showSnackBar(SnackBar(
+                      if (testNameContext == 'nav') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
                             content: Text(
-                                'The result uploaded is not authentic. You may be ineligible for travel.')));
+                                'The result uploaded is not authentic. You may be ineligible for travel.'),
+                          ),
+                        );
                       } else {
                         var snackBar = SnackBar(
-                            content: Text(
-                                'The result uploaded is not authentic. You may be ineligible for travel.'));
+                          content: Text(
+                              'The result uploaded is not authentic. You may be ineligible for travel.'),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     } else {
                       msgController.clear();
-                      if (something == 'nav') {
-                        Scaffold.of(context).showSnackBar(SnackBar(
+                      if (testNameContext == 'nav') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
                             content: Text(
-                                'Valid test result uploaded. You\'re good to go!')));
+                                'Valid test result uploaded. You\'re good to go!'),
+                          ),
+                        );
                       } else {
                         var snackBar = SnackBar(
                             content: Text(
@@ -544,15 +438,17 @@ class _UploadState extends State<Upload> {
                       }
                     }
                   });
-
-                }  else {
-                  return Scaffold.of(context).showSnackBar(
-                      SnackBar(content: Text('Test name already exists')));
+                } else {
+                  return ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Test name already exists.'),
+                    ),
+                  );
                 }
-
               } else {
                 // choose image from gallery
                 final imageFromGallery =
+                    // ignore: deprecated_member_use
                     await ImagePicker.pickImage(source: ImageSource.gallery);
                 print('gallery image path: ${imageFromGallery.path}');
 
@@ -575,14 +471,14 @@ class _UploadState extends State<Upload> {
 
                 // push download url of uploaded image to testImageUrl string
                 try {
-                  firebase_storage.TaskSnapshot snapshot =
-                      await testImageUploadTask;
                   testImageUrl = await _storage
                       .ref(
                           '${user.email}/tests/${basename(imageFromGallery.path)}')
                       .getDownloadURL();
                   print('uploaded image: $testImageUrl');
                 } catch (e) {
+                  firebase_storage.TaskSnapshot snapshot =
+                      await testImageUploadTask;
                   print(testImageUploadTask.snapshot);
                 }
 
@@ -622,10 +518,13 @@ class _UploadState extends State<Upload> {
                   // return response to user according to test result
                   if (!validTest) {
                     msgController.clear();
-                    if (something == 'nav') {
-                      Scaffold.of(context).showSnackBar(SnackBar(
+                    if (testNameContext == 'nav') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
                           content: Text(
-                              'The result uploaded is not authentic. You may be ineligible for travel.')));
+                              'The result uploaded is not authentic. You may be ineligible for travel.'),
+                        ),
+                      );
                     } else {
                       var snackBar = SnackBar(
                           content: Text(
@@ -634,7 +533,8 @@ class _UploadState extends State<Upload> {
                     }
                   } else {
                     msgController.clear();
-                    if (something == 'nav') {
+                    if (testNameContext == 'nav') {
+                      // ignore: deprecated_member_use
                       Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text(
                               'Valid test result uploaded. You\'re good to go!')));
@@ -698,6 +598,44 @@ class _UploadState extends State<Upload> {
       displayedText,
       style: TextStyle(color: MyColors.darkPrimary, fontSize: 14),
       textAlign: TextAlign.center,
+    );
+  }
+}
+
+class TestNameTextFormField extends StatelessWidget {
+  final TextEditingController messageController;
+  final String hintText;
+  final Function onChanged;
+  final bool isEnabled;
+
+  TestNameTextFormField(
+      {@required this.messageController,
+      @required this.hintText,
+      this.onChanged,
+      this.isEnabled});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: messageController,
+      decoration: InputDecoration(
+        counter: Container(),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+        hintStyle: Theme.of(context)
+            .textTheme
+            .headline6
+            .copyWith(color: Colors.grey[800]),
+        hintText: hintText,
+        fillColor: MyColors.offWhite,
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: MyColors.darkGrey, width: 2.0)),
+      ),
+      validator: (String testName) {
+        return testName.isEmpty ? 'Name is required' : null;
+      },
+      onChanged: onChanged,
+      enabled: isEnabled,
     );
   }
 }
