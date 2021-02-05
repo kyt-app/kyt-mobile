@@ -376,6 +376,9 @@ class _RegisterState extends State<Register> {
                                                       .putFile(userPfp);
 
                                               try {
+                                                firebase_storage.TaskSnapshot
+                                                    snapshot =
+                                                    await userPfpUploadTask;
                                                 // get download url of uploaded image
                                                 userPfpUrl = await _storage
                                                     .ref(
