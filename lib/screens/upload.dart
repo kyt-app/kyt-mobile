@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
@@ -14,22 +15,42 @@ import 'package:kyt/screens/navigation.dart';
 import 'package:path/path.dart';
 import '../widgets/settingsRow.dart';
 
-Future<String> getTextFromOCR(List<int> imageBytes) async {
+Future<String> getOCRLink(List<int> imageBytes) async {
   final ocrEndpoint = Uri.parse(
-      'https://kyt-app-ocr.cognitiveservices.azure.com/vision/v3.1/ocr');
-  final azureResponse = await http.post(ocrEndpoint,
+      'https://kyt-app-ocr.cognitiveservices.azure.com/vision/v3.2-preview.1/read/analyze');
+  final readImageLink = await http.post(ocrEndpoint,
       headers: <String, String>{
         'Ocp-Apim-Subscription-Key': 'b583a5bb13ff448399982684386e48ac',
         'Content-Type': 'application/octet-stream'
       },
       body: imageBytes);
 
+  String resultsEndpoint = '';
+
+  if (readImageLink.statusCode == 202) {
+    Map<String, String> link = readImageLink.headers;
+    resultsEndpoint = link['operation-location'];
+    print(resultsEndpoint);
+  }
+
+  return resultsEndpoint;
+}
+
+Future<String> getTextFromOCR(String endpoint) async {
   String ocrText = '';
 
-  if (azureResponse.statusCode == 200) {
-    Map<String, dynamic> responseMap = json.decode(azureResponse.body);
+  final resultsResponse = await http.get(
+      endpoint,
+      headers: <String, String> {
+        'Ocp-Apim-Subscription-Key': 'b583a5bb13ff448399982684386e48ac'
+      }
+  );
 
-    for (var region in responseMap['regions']) {
+  if (resultsResponse.statusCode == 200) {
+    print(resultsResponse.body);
+    Map<String, dynamic> responseMap = json.decode(resultsResponse.body);
+
+    for (var region in responseMap['analyzeResult']['readResults']) {
       for (var lines in region['lines']) {
         for (var words in lines['words']) {
           ocrText += words['text'] + ' ';
@@ -37,6 +58,8 @@ Future<String> getTextFromOCR(List<int> imageBytes) async {
       }
     }
   }
+
+  print(ocrText);
 
   return ocrText;
 }
@@ -185,9 +208,7 @@ class _UploadState extends State<Upload> {
                                 color: MyColors.darkGrey, width: 2.0)),
                       ),
                       validator: (String testName) {
-                        if (testName.isEmpty) {
-                          return 'Name is required';
-                        }
+                        return testName.isEmpty ? 'Test name is required' : null;
                       },
                       enabled: false,
                     )),
@@ -256,49 +277,56 @@ class _UploadState extends State<Upload> {
                     setState(() {
                       progressMessage = "Running OCR";
                     });
-                    String ocrText = await getTextFromOCR(imageBytes);
 
-                    print('ocr was completed');
+                    String resultsEndpoint = await getOCRLink(imageBytes);
+                    String ocrText = '';
 
-                    setState(() {
-                      progressMessage = "Validating";
+                    Timer(Duration(seconds: 2), () async {
+                      ocrText = await getTextFromOCR(resultsEndpoint);
+
+                      print('ocr was completed');
+
+                      setState(() {
+                        progressMessage = "Validating";
+                      });
+
+                      // push data to db and validate test result
+                      validTest = await validateAndUploadData(
+                          ocrText, user.uid, testName, testImageUrl);
+
+                      print('camera intent valid test result: $validTest');
+                      setState(() {
+                        // set the progress indicator to true so it would not be visible
+                        showProgress = false;
+                      });
+                      // return response according to test result
+                      if (!validTest) {
+                        msgController.clear();
+                        if (something == 'nav') {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'The result uploaded is not authentic. You may be ineligible for travel.')));
+                        } else {
+                          var snackBar = SnackBar(
+                              content: Text(
+                                  'The result uploaded is not authentic. You may be ineligible for travel.'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      } else {
+                        msgController.clear();
+                        if (something == 'nav') {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'Valid test result uploaded. You\'re good to go!')));
+                        } else {
+                          var snackBar = SnackBar(
+                              content: Text(
+                                  'Valid test result uploaded. You\'re good to go!'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      }
                     });
 
-                    // push data to db and validate test result
-                    validTest = await validateAndUploadData(
-                        ocrText, user.uid, testName, testImageUrl);
-
-                    print('camera intent valid test result: $validTest');
-                    setState(() {
-                      // set the progress indicator to true so it would not be visible
-                      showProgress = false;
-                    });
-                    // return response according to test result
-                    if (!validTest) {
-                      msgController.clear();
-                      if (something == 'nav') {
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                                'The result uploaded is not authentic. You may be ineligible for travel.')));
-                      } else {
-                        var snackBar = SnackBar(
-                            content: Text(
-                                'The result uploaded is not authentic. You may be ineligible for travel.'));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    } else {
-                      msgController.clear();
-                      if (something == 'nav') {
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                                'Valid test result uploaded. You\'re good to go!')));
-                      } else {
-                        var snackBar = SnackBar(
-                            content: Text(
-                                'Valid test result uploaded. You\'re good to go!'));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    }
                   } else {
                     return Scaffold.of(context).showSnackBar(
                         SnackBar(content: Text('Test name already exists')));
@@ -350,49 +378,56 @@ class _UploadState extends State<Upload> {
                   setState(() {
                     progressMessage = "Running OCR";
                   });
-                  String ocrText = await getTextFromOCR(imageBytes);
 
-                  print('ocr was completed');
+                  String resultsEndpoint = await getOCRLink(imageBytes);
+                  String ocrText = '';
 
-                  setState(() {
-                    progressMessage = "Validating";
+                  Timer(Duration(seconds: 2), () async {
+                    ocrText = await getTextFromOCR(resultsEndpoint);
+
+                    print('ocr was completed');
+
+                    setState(() {
+                      progressMessage = "Validating";
+                    });
+
+                    // push data to db and validate test result
+                    validTest = await validateAndUploadData(
+                        ocrText, user.uid, testName, testImageUrl);
+
+                    print('camera intent valid test result: $validTest');
+                    setState(() {
+                      // set the progress indicator to true so it would not be visible
+                      showProgress = false;
+                    });
+                    // return response according to test result
+                    if (!validTest) {
+                      msgController.clear();
+                      if (something == 'nav') {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.')));
+                      } else {
+                        var snackBar = SnackBar(
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    } else {
+                      msgController.clear();
+                      if (something == 'nav') {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'Valid test result uploaded. You\'re good to go!')));
+                      } else {
+                        var snackBar = SnackBar(
+                            content: Text(
+                                'Valid test result uploaded. You\'re good to go!'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    }
                   });
 
-                  // push data to db and validate test result
-                  validTest = await validateAndUploadData(
-                      ocrText, user.uid, testName, testImageUrl);
-
-                  print('camera intent valid test result: $validTest');
-                  setState(() {
-                    // set the progress indicator to true so it would not be visible
-                    showProgress = false;
-                  });
-                  // return response according to test result
-                  if (!validTest) {
-                    msgController.clear();
-                    if (something == 'nav') {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              'The result uploaded is not authentic. You may be ineligible for travel.')));
-                    } else {
-                      var snackBar = SnackBar(
-                          content: Text(
-                              'The result uploaded is not authentic. You may be ineligible for travel.'));
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                  } else {
-                    msgController.clear();
-                    if (something == 'nav') {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              'Valid test result uploaded. You\'re good to go!')));
-                    } else {
-                      var snackBar = SnackBar(
-                          content: Text(
-                              'Valid test result uploaded. You\'re good to go!'));
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                  }
                 }
               }),
           SettingsRow(
@@ -415,7 +450,7 @@ class _UploadState extends State<Upload> {
                 if (!testNameExists) {
                   // choose image from gallery
                   final imageFromGallery =
-                      await ImagePicker.pickImage(source: ImageSource.gallery);
+                  await ImagePicker.pickImage(source: ImageSource.gallery);
                   print('gallery image path: ${imageFromGallery.path}');
 
                   setState(() {
@@ -428,7 +463,7 @@ class _UploadState extends State<Upload> {
                   // start firebase upload task
                   firebase_storage.UploadTask testImageUploadTask = _storage
                       .ref(
-                          '${user.email}/tests/${basename(imageFromGallery.path)}')
+                      '${user.email}/tests/${basename(imageFromGallery.path)}')
                       .putFile(imageFromGallery);
 
                   setState(() {
@@ -438,10 +473,11 @@ class _UploadState extends State<Upload> {
                   // push download url of uploaded image to testImageUrl string
                   try {
                     firebase_storage.TaskSnapshot snapshot =
-                        await testImageUploadTask;
+                    await testImageUploadTask;
                     testImageUrl = await _storage
                         .ref(
-                            '${user.email}/tests/${basename(imageFromGallery.path)}')
+                        '${user.email}/tests/${basename(
+                            imageFromGallery.path)}')
                         .getDownloadURL();
                     print('uploaded image: $testImageUrl');
                   } catch (e) {
@@ -459,53 +495,61 @@ class _UploadState extends State<Upload> {
                   setState(() {
                     progressMessage = "Running OCR";
                   });
-                  String ocrText = await getTextFromOCR(imageBytes);
 
-                  print('ocr was completed.');
+                  String resultsEndpoint = await getOCRLink(imageBytes);
+                  String ocrText = '';
 
-                  setState(() {
-                    progressMessage = "Validating";
+                  Timer(Duration(seconds: 2), () async {
+                    ocrText = await getTextFromOCR(resultsEndpoint);
+
+                    print('ocr was completed.');
+
+                    setState(() {
+                      progressMessage = "Validating";
+                    });
+
+                    // push data to db and validate test result
+                    validTest = await validateAndUploadData(
+                        ocrText, user.uid, testName, testImageUrl);
+
+                    print('gallery intent valid test result: $validTest');
+                    setState(() {
+                      // set the progress indicator to true so it would not be visible
+                      showProgress = false;
+                    });
+                    // return response to user according to test result
+                    if (!validTest) {
+                      msgController.clear();
+                      if (something == 'nav') {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.')));
+                      } else {
+                        var snackBar = SnackBar(
+                            content: Text(
+                                'The result uploaded is not authentic. You may be ineligible for travel.'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    } else {
+                      msgController.clear();
+                      if (something == 'nav') {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                'Valid test result uploaded. You\'re good to go!')));
+                      } else {
+                        var snackBar = SnackBar(
+                            content: Text(
+                                'Valid test result uploaded. You\'re good to go!'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    }
                   });
 
-                  // push data to db and validate test result
-                  validTest = await validateAndUploadData(
-                      ocrText, user.uid, testName, testImageUrl);
-
-                  print('gallery intent valid test result: $validTest');
-                  setState(() {
-                    // set the progress indicator to true so it would not be visible
-                    showProgress = false;
-                  });
-                  // return response to user according to test result
-                  if (!validTest) {
-                    msgController.clear();
-                    if (something == 'nav') {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              'The result uploaded is not authentic. You may be ineligible for travel.')));
-                    } else {
-                      var snackBar = SnackBar(
-                          content: Text(
-                              'The result uploaded is not authentic. You may be ineligible for travel.'));
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                  } else {
-                    msgController.clear();
-                    if (something == 'nav') {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              'Valid test result uploaded. You\'re good to go!')));
-                    } else {
-                      var snackBar = SnackBar(
-                          content: Text(
-                              'Valid test result uploaded. You\'re good to go!'));
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                  }
-                } else {
+                }  else {
                   return Scaffold.of(context).showSnackBar(
                       SnackBar(content: Text('Test name already exists')));
                 }
+
               } else {
                 // choose image from gallery
                 final imageFromGallery =
@@ -553,49 +597,55 @@ class _UploadState extends State<Upload> {
                 setState(() {
                   progressMessage = "Running OCR";
                 });
-                String ocrText = await getTextFromOCR(imageBytes);
 
-                print('ocr was completed.');
+                String resultsEndpoint = await getOCRLink(imageBytes);
+                String ocrText = '';
 
-                setState(() {
-                  progressMessage = "Validating";
-                });
+                Timer(Duration(seconds: 2), () async {
+                  ocrText = await getTextFromOCR(resultsEndpoint);
 
-                // push data to db and validate test result
-                validTest = await validateAndUploadData(
-                    ocrText, user.uid, testName, testImageUrl);
+                  print('ocr was completed.');
 
-                print('gallery intent valid test result: $validTest');
-                setState(() {
-                  // set the progress indicator to true so it would not be visible
-                  showProgress = false;
-                });
-                // return response to user according to test result
-                if (!validTest) {
-                  msgController.clear();
-                  if (something == 'nav') {
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            'The result uploaded is not authentic. You may be ineligible for travel.')));
+                  setState(() {
+                    progressMessage = "Validating";
+                  });
+
+                  // push data to db and validate test result
+                  validTest = await validateAndUploadData(
+                      ocrText, user.uid, testName, testImageUrl);
+
+                  print('gallery intent valid test result: $validTest');
+                  setState(() {
+                    // set the progress indicator to true so it would not be visible
+                    showProgress = false;
+                  });
+                  // return response to user according to test result
+                  if (!validTest) {
+                    msgController.clear();
+                    if (something == 'nav') {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'The result uploaded is not authentic. You may be ineligible for travel.')));
+                    } else {
+                      var snackBar = SnackBar(
+                          content: Text(
+                              'The result uploaded is not authentic. You may be ineligible for travel.'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
                   } else {
-                    var snackBar = SnackBar(
-                        content: Text(
-                            'The result uploaded is not authentic. You may be ineligible for travel.'));
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    msgController.clear();
+                    if (something == 'nav') {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!')));
+                    } else {
+                      var snackBar = SnackBar(
+                          content: Text(
+                              'Valid test result uploaded. You\'re good to go!'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
                   }
-                } else {
-                  msgController.clear();
-                  if (something == 'nav') {
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            'Valid test result uploaded. You\'re good to go!')));
-                  } else {
-                    var snackBar = SnackBar(
-                        content: Text(
-                            'Valid test result uploaded. You\'re good to go!'));
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                }
+                });
               }
             },
           ),
