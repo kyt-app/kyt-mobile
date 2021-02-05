@@ -441,7 +441,15 @@ class _RegisterState extends State<Register> {
                                               throw Exception(
                                                   'Failed to create user.');
                                             }
-                                          } else {}
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'The entered passport number is already registered with a different account.'),
+                                              ),
+                                            );
+                                          }
                                         }
                                       },
                                     ),
