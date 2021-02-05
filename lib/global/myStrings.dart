@@ -32,7 +32,8 @@ class MyStrings {
   static const somethingWentWrongError = "Something went wrong";
   static const emailError = "Invalid email address entered.";
   static const passwordRequiredError = "Password is required.";
-  static const passwordLengthError = "Password too short.";
+  static const passwordLengthError =
+      "Password must be at least 6 characters long.";
   static const passwordMismatchError = "Passwords do not match";
   static const phoneNumberError = "Phone number is required.";
   static const passportNumberError = "Invalid passport number entered.";

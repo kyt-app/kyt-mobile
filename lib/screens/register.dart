@@ -278,6 +278,13 @@ class _RegisterState extends State<Register> {
                                           return MyStrings
                                               .passwordRequiredError;
                                         }
+                                        if (password.length < 6) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(MyStrings
+                                                      .passwordLengthError)));
+                                          return MyStrings.passwordLengthError;
+                                        }
                                         return null;
                                       },
                                       onSaved: (String password) {
