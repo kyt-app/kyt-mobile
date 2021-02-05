@@ -7,13 +7,13 @@ import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/widgets/testCard.dart';
+import 'package:kyt/widgets/userPictureAndName.dart';
 
 Future<String> getUserTests(String authToken) async {
   final updateStatusEndpoint = Uri.parse(
       'https://kyt-api.azurewebsites.net/update/status?authToken=$authToken');
   final response = await http.get(updateStatusEndpoint);
   if (response.statusCode == 200) {
-    print(response.body);
     final testsEndpoint = Uri.parse(
         'https://kyt-api.azurewebsites.net/profile?authToken=$authToken');
     final profileResponse = await http.get(testsEndpoint);
@@ -55,35 +55,7 @@ class _HomeState extends State<Home> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                      color: MyColors.darkPrimary,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      padding: EdgeInsets.all(MyDimens.double_40),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(MyDimens.double_200),
-                            child: Image.network(
-                              '${user.photoURL}',
-                              height: 100.0,
-                              width: 100.0,
-                            ),
-                          ),
-                          MySpaces.vGapInBetween,
-                          Text(
-                            '${user.displayName}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6
-                                .copyWith(
-                                    color: MyColors.white,
-                                    fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      )),
+                  UserPictureAndName(user: user),
                   Container(
                       child: Container(
                     margin: EdgeInsets.all(MyDimens.double_30),
@@ -129,14 +101,3 @@ class _HomeState extends State<Home> {
         });
   }
 }
-
-// ${userProfile['name']}
-/*
-Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: NetworkImage('${userProfile['pfp']}')
-                          ),
-                        ),
-                      ),*/

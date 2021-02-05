@@ -1,12 +1,7 @@
-import 'dart:convert';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/myDimens.dart';
 import 'package:kyt/global/mySpaces.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:http/http.dart' as http;
 
 class About extends StatefulWidget {
   static String id = "about";
@@ -44,11 +39,12 @@ class _AboutState extends State<About> {
                     width: 150.0,
                   ),
                 ),
-                Text(
-                  'Know Your Traveller',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headline4.copyWith(color: MyColors.darkPrimary)
-                ),
+                Text('Know Your Traveller',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline4
+                        .copyWith(color: MyColors.darkPrimary)),
                 Text(
                   '\nKYT is a privacy-focused and entrusted intermediary service between travellers and travel service providers, which enables passengers to share the required health records without revealing any other personal information. ',
                   style: TextStyle(

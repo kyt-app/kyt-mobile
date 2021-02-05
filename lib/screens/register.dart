@@ -1,17 +1,17 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:io';
+import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/global/myStrings.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:kyt/screens/login.dart';
-import 'package:http/http.dart' as http;
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
 
 Future<bool> passportCheckIfExists(String passportNumber) async {
@@ -132,8 +132,8 @@ class _RegisterState extends State<Register> {
                                         RegExp emailRegex = RegExp(
                                             r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
                                         if (!emailRegex.hasMatch(email)) {
-                                          Scaffold.of(context).showSnackBar(
-                                              SnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
                                                   content: Text(
                                                       MyStrings.emailError)));
                                           return MyStrings.emailError;
@@ -167,8 +167,8 @@ class _RegisterState extends State<Register> {
                                       keyboardType: TextInputType.phone,
                                       validator: (String phone) {
                                         if (phone.isEmpty) {
-                                          Scaffold.of(context).showSnackBar(
-                                              SnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
                                                   content: Text(MyStrings
                                                       .phoneNumberError)));
                                           return MyStrings.phoneNumberError;
@@ -223,8 +223,8 @@ class _RegisterState extends State<Register> {
                                               r"^[A-PR-WYa-pr-wy][1-9]\d{5}[1-9]$");
                                           if (!indianPassport
                                               .hasMatch(passport)) {
-                                            Scaffold.of(context).showSnackBar(
-                                                SnackBar(
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
                                                     content: Text(MyStrings
                                                         .passportNumberError)));
                                             return MyStrings
@@ -235,8 +235,8 @@ class _RegisterState extends State<Register> {
                                           RegExp usPassport = RegExp(
                                               r"^(?!(0))[a-zA-Z0-9]{6,9}$");
                                           if (!usPassport.hasMatch(passport)) {
-                                            Scaffold.of(context).showSnackBar(
-                                                SnackBar(
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
                                                     content: Text(MyStrings
                                                         .passportNumberError)));
                                             return MyStrings
@@ -271,8 +271,8 @@ class _RegisterState extends State<Register> {
                                           TextInputType.visiblePassword,
                                       validator: (String password) {
                                         if (password.isEmpty) {
-                                          Scaffold.of(context).showSnackBar(
-                                              SnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
                                                   content: Text(MyStrings
                                                       .passwordRequiredError)));
                                           return MyStrings
@@ -306,6 +306,7 @@ class _RegisterState extends State<Register> {
                                           ]),
                                       onPressed: () async {
                                         final pfpImage =
+                                            // ignore: deprecated_member_use
                                             await ImagePicker.pickImage(
                                                 source: ImageSource.gallery);
                                         userPfpPath = pfpImage.path;
@@ -348,8 +349,8 @@ class _RegisterState extends State<Register> {
 
                                           if (!passportExists) {
                                             print(MyStrings.registeringLabel);
-                                            Scaffold.of(context).showSnackBar(
-                                                SnackBar(
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
                                                     content: Text(MyStrings
                                                             .registeringLabel +
                                                         userName)));
@@ -433,11 +434,7 @@ class _RegisterState extends State<Register> {
                                             if (newUser != null) {
                                               Navigator.pushNamed(
                                                   context, Login.id);
-                                              // FIXME: this snackbar does not show up
-                                              Scaffold.of(context).showSnackBar(
-                                                  SnackBar(
-                                                      content: Text(
-                                                          'Registration successful. Welcome aboard!')));
+                                              // TODO: Add a toast or something because snackbar won't work
                                             }
 
                                             if (response.statusCode == 201) {
@@ -448,10 +445,13 @@ class _RegisterState extends State<Register> {
                                                   'Failed to create user.');
                                             }
                                           } else {
-                                            Scaffold.of(context).showSnackBar(
-                                                SnackBar(
-                                                    content: Text(
-                                                        'The entered passport number is already registered with a different account.')));
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'The entered passport number is already registered with a different account.'),
+                                              ),
+                                            );
                                           }
                                         }
                                       },
