@@ -33,7 +33,6 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false,
           backgroundColor: MyColors.darkPrimary,
           centerTitle: true,
           title: Text('Edit Profile',
@@ -156,7 +155,7 @@ class _EditProfileState extends State<EditProfile> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: <Widget>[
-                                            Text('Change PFP',
+                                            Text('Change picture',
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .headline6
@@ -172,7 +171,7 @@ class _EditProfileState extends State<EditProfile> {
                                         setState(() => {showMessage = true});
                                         setState(() => {
                                               message =
-                                                  "Save profile to apply PFP change"
+                                                  "Save profile to apply picture change"
                                             });
                                       },
                                     ),
@@ -225,7 +224,7 @@ class _EditProfileState extends State<EditProfile> {
                                                   .ref(
                                                       '$userEmail/pfp/${basename(userPfpPath)}')
                                                   .getDownloadURL();
-                                              print('uploaded pfp.');
+                                              print('uploaded picture.');
                                               print(userPfpUrl);
                                             } catch (e) {
                                               print(userPfpUploadTask.snapshot);

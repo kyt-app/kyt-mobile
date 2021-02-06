@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:kyt/functions/showSignoutConfirmation.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/screens/editProfile.dart';
-import 'package:kyt/screens/login.dart';
 import 'package:kyt/screens/reportABug.dart';
 import 'package:kyt/widgets/settingsRow.dart';
 import 'package:kyt/widgets/userPictureAndName.dart';
@@ -31,12 +31,6 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   FirebaseAuth auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
-
-  Future<void> _signOut() async {
-    await auth.signOut();
-    Navigator.pushNamed(context, Login.id);
-    // TODO: Add a toast or something because snackbar won't work
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,9 +88,7 @@ class _SettingsState extends State<Settings> {
                             .subtitle1
                             .copyWith(color: MyColors.white)),
                     onPressed: () {
-                      var snackBar = SnackBar(content: Text('Signing out'));
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      _signOut();
+                      showSignoutConfirmation(context, auth);
                     },
                   ),
                 ),

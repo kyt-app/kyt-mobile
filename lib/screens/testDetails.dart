@@ -2,46 +2,16 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:kyt/functions/getTestDetails.dart';
+import 'package:kyt/functions/showDeleteConfirmation.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
-import 'package:kyt/screens/navigation.dart';
 import 'package:kyt/screens/upload.dart';
 import 'package:kyt/widgets/card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'upload.dart';
-
-Future<String> getTestDetails(String testName, String authToken) async {
-  final testDetailsEndpoint = Uri.parse(
-      'https://kyt-api.azurewebsites.net/tests/testdetails?authToken=$authToken&testName=$testName');
-  final response = await http.get(testDetailsEndpoint);
-
-  if (response.statusCode == 200) {
-    return response.body;
-  }
-
-  return null;
-}
-
-Future<String> deleteTest(String testName, String authToken) async {
-  final http.Response response = await http.post(
-    'https://kyt-api.azurewebsites.net/tests/deletetest',
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8'
-    },
-    body: jsonEncode(
-        <String, String>{"authToken": authToken, "testName": testName}),
-  );
-
-  if (response.statusCode == 200) {
-    print(response.body);
-    return response.body;
-  }
-
-  return null;
-}
 
 class TestDetails extends StatefulWidget {
   static String id = "testDetails";
@@ -85,10 +55,7 @@ class _TestDetails extends State<TestDetails> {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    Future<String> res =
-                        deleteTest(details['testName'], user.uid);
-                    print(res);
-                    Navigator.pushNamed(context, Navigation.id);
+                    showDeleteConfirmation(context, details, user);
                   },
                 )
               ],
@@ -102,18 +69,22 @@ class _TestDetails extends State<TestDetails> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Center(
-                      child: Ink(
-                          decoration: ShapeDecoration(
-                              color: details['status'] == 'valid'
-                                  ? MyColors.green
-                                  : Colors.red,
-                              shape: CircleBorder()),
-                          child: Icon(
-                              details['status'] == 'valid'
-                                  ? Icons.check
-                                  : Icons.clear,
-                              color: Colors.white,
-                              size: 100.0))),
+                    child: Ink(
+                      padding: EdgeInsets.all(10),
+                      decoration: ShapeDecoration(
+                        color: details['status'] == 'valid'
+                            ? MyColors.green
+                            : Colors.red,
+                        shape: CircleBorder(),
+                      ),
+                      child: Icon(
+                          details['status'] == 'valid'
+                              ? Icons.check
+                              : Icons.clear,
+                          color: Colors.white,
+                          size: 76.0),
+                    ),
+                  ),
                   MySpaces.vGapInBetween,
                   Center(
                     child: Text(details['testName'],
@@ -146,7 +117,12 @@ class _TestDetails extends State<TestDetails> {
                   MySpaces.vGapInBetween,
                   VerifyCard(
                       // keep validity for 3 days after the issuing date
-                      text: !details['testName'].toString().contains('vaccine') || !details['testName'].toString().contains('vaccination')
+                      text: !details['testName']
+                                  .toString()
+                                  .contains('vaccine') ||
+                              !details['testName']
+                                  .toString()
+                                  .contains('vaccination')
                           ? '${DateFormat.MMMMEEEEd('en_US').format(DateTime.fromMillisecondsSinceEpoch(DateTime.parse(details['timestamp']).millisecondsSinceEpoch + 259200000))}'
                           : 'No expiry date'),
                   MySpaces.vMediumGapInBetween,

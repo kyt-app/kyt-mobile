@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
 import 'package:kyt/global/myStrings.dart';
@@ -180,19 +179,23 @@ class _RegisterState extends State<Register> {
                                       },
                                     ),
                                     MySpaces.vGapInBetween,
-                                    DropdownButton(
-                                      isExpanded: true,
-                                      value: userCountry,
-                                      items: countries.map((country) {
-                                        return DropdownMenuItem(
-                                            value: country,
-                                            child: Text(country));
-                                      }).toList(),
-                                      onChanged: (country) {
-                                        setState(() {
-                                          userCountry = country;
-                                        });
-                                      },
+                                    Container(
+                                      child: DropdownButton(
+                                        hint: Text('Choose your country'),
+                                        dropdownColor: MyColors.offWhite,
+                                        isExpanded: true,
+                                        value: userCountry,
+                                        items: countries.map((country) {
+                                          return DropdownMenuItem(
+                                              value: country,
+                                              child: Text(country));
+                                        }).toList(),
+                                        onChanged: (country) {
+                                          setState(() {
+                                            userCountry = country;
+                                          });
+                                        },
+                                      ),
                                     ),
                                     MySpaces.vGapInBetween,
                                     TextFormField(
@@ -304,34 +307,6 @@ class _RegisterState extends State<Register> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: <Widget>[
-                                            Text('Upload PFP',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6
-                                                    .copyWith(
-                                                        color: MyColors.white))
-                                          ]),
-                                      onPressed: () async {
-                                        final pfpImage =
-                                            // ignore: deprecated_member_use
-                                            await ImagePicker.pickImage(
-                                                source: ImageSource.gallery);
-                                        userPfpPath = pfpImage.path;
-                                      },
-                                    ),
-                                    MySpaces.vSmallGapInBetween,
-                                    RaisedButton(
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8.0)),
-                                      ),
-                                      padding: EdgeInsets.all(14.0),
-                                      color: MyColors.darkPrimary,
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
                                             Text(
                                                 MyStrings.createNewAccountLabel,
                                                 style: Theme.of(context)
@@ -392,7 +367,7 @@ class _RegisterState extends State<Register> {
                                                         '$userEmail/pfp/${basename(userPfpPath)}')
                                                     .getDownloadURL();
 
-                                                print('uploaded pfp.');
+                                                print('uploaded picture.');
                                                 print(userPfpUrl);
                                               } catch (e) {
                                                 print(
