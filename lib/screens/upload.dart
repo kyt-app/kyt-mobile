@@ -108,6 +108,7 @@ class _UploadState extends State<Upload> {
                 if (testName == null) {
                   if (testNameContext == 'nav') {
                     return Scaffold.of(context).showSnackBar(SnackBar(
+                        behavior: SnackBarBehavior.floating,
                         content: Text(
                             'Please enter the test name before proceeding.')));
                   } else {
@@ -192,10 +193,12 @@ class _UploadState extends State<Upload> {
                         msgController.clear();
                         if (testNameContext == 'nav') {
                           Scaffold.of(context).showSnackBar(SnackBar(
+                              behavior: SnackBarBehavior.floating,
                               content: Text(
                                   'The result uploaded is not authentic. You may be ineligible for travel.')));
                         } else {
                           var snackBar = SnackBar(
+                              behavior: SnackBarBehavior.floating,
                               content: Text(
                                   'The result uploaded is not authentic. You may be ineligible for travel.'));
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -204,10 +207,12 @@ class _UploadState extends State<Upload> {
                         msgController.clear();
                         if (testNameContext == 'nav') {
                           Scaffold.of(context).showSnackBar(SnackBar(
+                              behavior: SnackBarBehavior.floating,
                               content: Text(
                                   'Valid test result uploaded. You\'re good to go!')));
                         } else {
                           var snackBar = SnackBar(
+                              behavior: SnackBarBehavior.floating,
                               content: Text(
                                   'Valid test result uploaded. You\'re good to go!'));
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -215,8 +220,9 @@ class _UploadState extends State<Upload> {
                       }
                     });
                   } else {
-                    return Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text('Test name already exists')));
+                    return Scaffold.of(context).showSnackBar(SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text('Test name already exists')));
                   }
                 } else {
                   // get image from camera
@@ -292,10 +298,12 @@ class _UploadState extends State<Upload> {
                       msgController.clear();
                       if (testNameContext == 'nav') {
                         Scaffold.of(context).showSnackBar(SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'The result uploaded is not authentic. You may be ineligible for travel.')));
                       } else {
                         var snackBar = SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'The result uploaded is not authentic. You may be ineligible for travel.'));
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -304,10 +312,12 @@ class _UploadState extends State<Upload> {
                       msgController.clear();
                       if (testNameContext == 'nav') {
                         Scaffold.of(context).showSnackBar(SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'Valid test result uploaded. You\'re good to go!')));
                       } else {
                         var snackBar = SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'Valid test result uploaded. You\'re good to go!'));
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -323,6 +333,7 @@ class _UploadState extends State<Upload> {
               if (testName == null) {
                 if (testNameContext == 'nav') {
                   return Scaffold.of(context).showSnackBar(SnackBar(
+                      behavior: SnackBarBehavior.floating,
                       content: Text(
                           'Please enter the test name before proceeding.')));
                 } else {
@@ -407,10 +418,12 @@ class _UploadState extends State<Upload> {
                       msgController.clear();
                       if (testNameContext == 'nav') {
                         Scaffold.of(context).showSnackBar(SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'The result uploaded is not authentic. You may be ineligible for travel.')));
                       } else {
                         var snackBar = SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'The result uploaded is not authentic. You may be ineligible for travel.'));
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -419,10 +432,12 @@ class _UploadState extends State<Upload> {
                       msgController.clear();
                       if (testNameContext == 'nav') {
                         Scaffold.of(context).showSnackBar(SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'Valid test result uploaded. You\'re good to go!')));
                       } else {
                         var snackBar = SnackBar(
+                            behavior: SnackBarBehavior.floating,
                             content: Text(
                                 'Valid test result uploaded. You\'re good to go!'));
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -430,8 +445,9 @@ class _UploadState extends State<Upload> {
                     }
                   });
                 } else {
-                  return Scaffold.of(context).showSnackBar(
-                      SnackBar(content: Text('Test name already exists')));
+                  return Scaffold.of(context).showSnackBar(SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text('Test name already exists')));
                 }
               } else {
                 // choose image from gallery
@@ -507,10 +523,12 @@ class _UploadState extends State<Upload> {
                     msgController.clear();
                     if (testNameContext == 'nav') {
                       Scaffold.of(context).showSnackBar(SnackBar(
+                          behavior: SnackBarBehavior.floating,
                           content: Text(
                               'The result uploaded is not authentic. You may be ineligible for travel.')));
                     } else {
                       var snackBar = SnackBar(
+                          behavior: SnackBarBehavior.floating,
                           content: Text(
                               'The result uploaded is not authentic. You may be ineligible for travel.'));
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -519,10 +537,12 @@ class _UploadState extends State<Upload> {
                     msgController.clear();
                     if (testNameContext == 'nav') {
                       Scaffold.of(context).showSnackBar(SnackBar(
+                          behavior: SnackBarBehavior.floating,
                           content: Text(
                               'Valid test result uploaded. You\'re good to go!')));
                     } else {
                       var snackBar = SnackBar(
+                          behavior: SnackBarBehavior.floating,
                           content: Text(
                               'Valid test result uploaded. You\'re good to go!'));
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);

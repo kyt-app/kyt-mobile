@@ -150,10 +150,6 @@ class _LoginState extends State<Login> {
                                                   email: userEmail,
                                                   password: userPassword);
                                           if (user != null) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                                    content: Text(MyStrings
-                                                        .loggingInLabel)));
                                             Navigator.pushNamed(
                                                 context, Navigation.id);
                                           } else {
