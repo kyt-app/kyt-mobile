@@ -253,12 +253,25 @@ class _EditProfileState extends State<EditProfile> {
                                           );
 
                                           if (response.statusCode == 200) {
-                                            print('profile updated');
-                                            setState(() => {indicator = false});
-                                            setState(() => {
-                                                  message =
-                                                      "Profile updated successfully"
-                                                });
+                                            if (response.body ==
+                                                "invalid picture") {
+                                              setState(
+                                                  () => {indicator = false});
+                                              setState(
+                                                  () => {showMessage = false});
+                                              var snackBar = SnackBar(
+                                                  content: Text(
+                                                      'Please upload a picture of yourself.'));
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(snackBar);
+                                            } else {
+                                              setState(
+                                                  () => {indicator = false});
+                                              setState(() => {
+                                                    message =
+                                                        "Profile updated successfully"
+                                                  });
+                                            }
                                           }
                                         }
                                       },
