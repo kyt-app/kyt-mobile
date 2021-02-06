@@ -17,7 +17,6 @@ class _ReportABugState extends State<ReportABug> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false,
           backgroundColor: MyColors.darkPrimary,
           centerTitle: true,
           title: Text('Report a bug',
