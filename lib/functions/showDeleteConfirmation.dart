@@ -28,7 +28,7 @@ showDeleteConfirmation(BuildContext context, details, user) {
   );
   // set up the AlertDialog
   AlertDialog alert = AlertDialog(
-    title: Text("Delete confirmation",
+    title: Text("Delete record",
         style: TextStyle(color: MyColors.darkPrimary)),
     content: Text("Are you sure you want to delete your test details?",
         style: TextStyle(color: MyColors.lightPrimary)),

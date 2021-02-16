@@ -171,7 +171,7 @@ class _UploadState extends State<Upload> {
                     String ocrText = '';
 
                     Timer(Duration(seconds: 2), () async {
-                      ocrText = await getTextFromOCR(resultsEndpoint);
+                      ocrText = await getTextFromOCR(resultsEndpoint, context);
 
                       print('ocr was completed');
 
@@ -276,7 +276,7 @@ class _UploadState extends State<Upload> {
                   String ocrText = '';
 
                   Timer(Duration(seconds: 2), () async {
-                    ocrText = await getTextFromOCR(resultsEndpoint);
+                    ocrText = await getTextFromOCR(resultsEndpoint, context);
 
                     print('ocr was completed');
 
@@ -396,7 +396,7 @@ class _UploadState extends State<Upload> {
                   String ocrText = '';
 
                   Timer(Duration(seconds: 2), () async {
-                    ocrText = await getTextFromOCR(resultsEndpoint);
+                    ocrText = await getTextFromOCR(resultsEndpoint, context);
 
                     print('ocr was completed.');
 
@@ -501,7 +501,7 @@ class _UploadState extends State<Upload> {
                 String ocrText = '';
 
                 Timer(Duration(seconds: 2), () async {
-                  ocrText = await getTextFromOCR(resultsEndpoint);
+                  ocrText = await getTextFromOCR(resultsEndpoint, context);
 
                   print('ocr was completed.');
 

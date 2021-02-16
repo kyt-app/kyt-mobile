@@ -119,10 +119,7 @@ class _TestDetails extends State<TestDetails> {
                       // keep validity for 3 days after the issuing date
                       text: !details['testName']
                                   .toString()
-                                  .contains('vaccine') ||
-                              !details['testName']
-                                  .toString()
-                                  .contains('vaccination')
+                                  .contains('vaccine')
                           ? '${DateFormat.MMMMEEEEd('en_US').format(DateTime.fromMillisecondsSinceEpoch(DateTime.parse(details['timestamp']).millisecondsSinceEpoch + 259200000))}'
                           : 'No expiry date'),
                   MySpaces.vMediumGapInBetween,

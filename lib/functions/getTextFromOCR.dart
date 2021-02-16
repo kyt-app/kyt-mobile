@@ -1,8 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-Future<String> getTextFromOCR(String endpoint) async {
+Future<String> getTextFromOCR(String endpoint, BuildContext context) async {
   String ocrText = '';
 
   final resultsResponse = await http.get(endpoint, headers: <String, String>{
@@ -13,13 +14,24 @@ Future<String> getTextFromOCR(String endpoint) async {
     print(resultsResponse.body);
     Map<String, dynamic> responseMap = json.decode(resultsResponse.body);
 
-    for (var region in responseMap['analyzeResult']['readResults']) {
-      for (var lines in region['lines']) {
-        for (var words in lines['words']) {
-          ocrText += words['text'] + ' ';
+    if (responseMap['status'] == 'running') {
+      print('it\'s taking longer than usual');
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text('It\'s taking longer than usual.')));
+
+      return getTextFromOCR(endpoint, context);
+
+    } else {
+      for (var region in responseMap['analyzeResult']['readResults']) {
+        for (var lines in region['lines']) {
+          for (var words in lines['words']) {
+            ocrText += words['text'] + ' ';
+          }
         }
       }
+
+      return ocrText;
     }
   }
-  return ocrText;
+
+  return null;
 }
