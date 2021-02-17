@@ -43,32 +43,35 @@ class _QRCodeState extends State<QRCode> {
 
           return Scaffold(
               backgroundColor: MyColors.offWhite,
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  UserPictureAndName(
-                    user: user,
-                  ),
-                  MySpaces.vSmallGapInBetween,
-                  QrImage(
-                    data: snapshot.data,
-                    version: QrVersions.auto,
-                    size: 250.0,
-                    foregroundColor: MyColors.darkPrimary,
-                  ),
-                  MySpaces.vMediumGapInBetween,
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30.0, vertical: 0),
-                      child: Text(
-                          'This is your pass for all the medical requirements for travel.\n\nSimply scan the code at a kiosk and you\'re good to go!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18.0)),
+              body: Semantics(
+                label: "QRCode",
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    UserPictureAndName(
+                      user: user,
                     ),
-                  )
-                ],
+                    MySpaces.vSmallGapInBetween,
+                    QrImage(
+                      data: snapshot.data,
+                      version: QrVersions.auto,
+                      size: 250.0,
+                      foregroundColor: MyColors.darkPrimary,
+                    ),
+                    MySpaces.vMediumGapInBetween,
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30.0, vertical: 0),
+                        child: Text(
+                            'This is your pass for all the medical requirements for travel.\n\nSimply scan the code at a kiosk and you\'re good to go!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 18.0)),
+                      ),
+                    )
+                  ],
+                ),
               ));
         });
   }

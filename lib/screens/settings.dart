@@ -36,67 +36,70 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyColors.offWhite,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          UserPictureAndName(user: user),
-          MySpaces.vMediumGapInBetween,
-          Padding(
-            padding: EdgeInsets.only(left: 38.0),
-            child: Text(
-              'Settings'.toUpperCase(),
-              style: Theme.of(context).textTheme.subtitle1.copyWith(
-                  color: MyColors.darkPrimary,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14),
-            ),
-          ),
-          MySpaces.vGapInBetween,
-          SettingsRow(
-            icon: Icons.edit,
-            label: 'Edit Profile',
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => EditProfile()));
-            },
-          ),
-          SettingsRow(
-            icon: Icons.report,
-            label: 'Report a bug',
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => ReportABug()));
-            },
-          ),
-          MySpaces.vGapInBetween,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Padding(
-                child: ButtonTheme(
-                  minWidth: 100.0,
-                  child: RaisedButton(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(6.0))),
-                    padding: EdgeInsets.all(14.0),
+      body: Semantics(
+        label: "Settings",
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            UserPictureAndName(user: user),
+            MySpaces.vMediumGapInBetween,
+            Padding(
+              padding: EdgeInsets.only(left: 38.0),
+              child: Text(
+                'Settings'.toUpperCase(),
+                style: Theme.of(context).textTheme.subtitle1.copyWith(
                     color: MyColors.darkPrimary,
-                    child: Text('Sign out',
-                        style: Theme.of(context)
-                            .textTheme
-                            .subtitle1
-                            .copyWith(color: MyColors.white)),
-                    onPressed: () {
-                      showSignoutConfirmation(context, auth);
-                    },
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14),
+              ),
+            ),
+            MySpaces.vGapInBetween,
+            SettingsRow(
+              icon: Icons.edit,
+              label: 'Edit Profile',
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => EditProfile()));
+              },
+            ),
+            SettingsRow(
+              icon: Icons.report,
+              label: 'Report a bug',
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => ReportABug()));
+              },
+            ),
+            MySpaces.vGapInBetween,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  child: ButtonTheme(
+                    minWidth: 100.0,
+                    child: RaisedButton(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(6.0))),
+                      padding: EdgeInsets.all(14.0),
+                      color: MyColors.darkPrimary,
+                      child: Text('Sign out',
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle1
+                              .copyWith(color: MyColors.white)),
+                      onPressed: () {
+                        showSignoutConfirmation(context, auth);
+                      },
+                    ),
                   ),
-                ),
-                padding: EdgeInsets.only(right: 36.0),
-              )
-            ],
-          )
-        ],
+                  padding: EdgeInsets.only(right: 36.0),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

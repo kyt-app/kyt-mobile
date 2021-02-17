@@ -45,23 +45,46 @@ class _EditProfileState extends State<EditProfile> {
         body: Builder(
           builder: (context) => ModalProgressHUD(
               inAsyncCall: showSpinner,
-              child: Container(
-                  color: MyColors.offWhite,
-                  child: Center(
-                      child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        MySpaces.vMediumGapInBetween,
-                        Container(
-                            child: Form(
-                                key: _formKey,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    TextFormField(
-                                        decoration: InputDecoration(
+              child: Semantics(
+                label: "Edit profile",
+                child: Container(
+                    color: MyColors.offWhite,
+                    child: Center(
+                        child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          MySpaces.vMediumGapInBetween,
+                          Container(
+                              child: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      TextFormField(
+                                          decoration: InputDecoration(
+                                              counter: Container(),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(5)),
+                                              ),
+                                              hintStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .headline6
+                                                  .copyWith(
+                                                      color: Colors.grey[800]),
+                                              hintText: '${user.displayName}',
+                                              fillColor: MyColors.offWhite,
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: MyColors.darkGrey,
+                                                    width: 2.0),
+                                              ),
+                                              enabled: false)),
+                                      MySpaces.vGapInBetween,
+                                      TextFormField(
+                                          decoration: InputDecoration(
                                             counter: Container(),
                                             border: OutlineInputBorder(
                                               borderRadius: BorderRadius.all(
@@ -72,16 +95,19 @@ class _EditProfileState extends State<EditProfile> {
                                                 .headline6
                                                 .copyWith(
                                                     color: Colors.grey[800]),
-                                            hintText: '${user.displayName}',
+                                            hintText: '${user.email}',
                                             fillColor: MyColors.offWhite,
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: MyColors.darkGrey,
                                                   width: 2.0),
                                             ),
-                                            enabled: false)),
-                                    MySpaces.vGapInBetween,
-                                    TextFormField(
+                                          ),
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                          enabled: false),
+                                      MySpaces.vGapInBetween,
+                                      TextFormField(
                                         decoration: InputDecoration(
                                           counter: Container(),
                                           border: OutlineInputBorder(
@@ -93,7 +119,7 @@ class _EditProfileState extends State<EditProfile> {
                                               .headline6
                                               .copyWith(
                                                   color: Colors.grey[800]),
-                                          hintText: '${user.email}',
+                                          hintText: MyStrings.phoneNumberLabel,
                                           fillColor: MyColors.offWhite,
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
@@ -101,207 +127,190 @@ class _EditProfileState extends State<EditProfile> {
                                                 width: 2.0),
                                           ),
                                         ),
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        enabled: false),
-                                    MySpaces.vGapInBetween,
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                        counter: Container(),
-                                        border: OutlineInputBorder(
+                                        keyboardType: TextInputType.phone,
+                                        validator: (String phone) {
+                                          if (phone.isEmpty) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    MyStrings.phoneNumberError),
+                                              ),
+                                            );
+                                            return MyStrings.phoneNumberError;
+                                          }
+                                          return null;
+                                        },
+                                        onSaved: (String phone) {
+                                          phoneNumber = phone;
+                                        },
+                                      ),
+                                      MySpaces.vGapInBetween,
+                                      RaisedButton(
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(5)),
+                                              Radius.circular(8.0)),
                                         ),
-                                        hintStyle: Theme.of(context)
-                                            .textTheme
-                                            .headline6
-                                            .copyWith(color: Colors.grey[800]),
-                                        hintText: MyStrings.phoneNumberLabel,
-                                        fillColor: MyColors.offWhite,
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: MyColors.darkGrey,
-                                              width: 2.0),
+                                        padding: EdgeInsets.all(14.0),
+                                        color: MyColors.darkPrimary,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Text('Change picture',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline6
+                                                      .copyWith(
+                                                          color:
+                                                              MyColors.white))
+                                            ]),
+                                        onPressed: () async {
+                                          final pfpImage =
+                                              // ignore: deprecated_member_use
+                                              await ImagePicker.pickImage(
+                                                  source: ImageSource.gallery);
+                                          userPfpPath = pfpImage.path;
+                                          setState(() => {showMessage = true});
+                                          setState(() => {
+                                                message =
+                                                    "Save profile to apply picture change"
+                                              });
+                                        },
+                                      ),
+                                      MySpaces.vSmallGapInBetween,
+                                      RaisedButton(
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8.0)),
                                         ),
-                                      ),
-                                      keyboardType: TextInputType.phone,
-                                      validator: (String phone) {
-                                        if (phone.isEmpty) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  MyStrings.phoneNumberError),
-                                            ),
-                                          );
-                                          return MyStrings.phoneNumberError;
-                                        }
-                                        return null;
-                                      },
-                                      onSaved: (String phone) {
-                                        phoneNumber = phone;
-                                      },
-                                    ),
-                                    MySpaces.vGapInBetween,
-                                    RaisedButton(
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8.0)),
-                                      ),
-                                      padding: EdgeInsets.all(14.0),
-                                      color: MyColors.darkPrimary,
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text('Change picture',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6
-                                                    .copyWith(
-                                                        color: MyColors.white))
-                                          ]),
-                                      onPressed: () async {
-                                        final pfpImage =
-                                            // ignore: deprecated_member_use
-                                            await ImagePicker.pickImage(
-                                                source: ImageSource.gallery);
-                                        userPfpPath = pfpImage.path;
-                                        setState(() => {showMessage = true});
-                                        setState(() => {
-                                              message =
-                                                  "Save profile to apply picture change"
-                                            });
-                                      },
-                                    ),
-                                    MySpaces.vSmallGapInBetween,
-                                    RaisedButton(
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8.0)),
-                                      ),
-                                      padding: EdgeInsets.all(14.0),
-                                      color: MyColors.darkPrimary,
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text('Save profile',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline6
-                                                    .copyWith(
-                                                        color: MyColors.white))
-                                          ]),
-                                      onPressed: () async {
-                                        _formKey.currentState.save();
+                                        padding: EdgeInsets.all(14.0),
+                                        color: MyColors.darkPrimary,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Text('Save profile',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline6
+                                                      .copyWith(
+                                                          color:
+                                                              MyColors.white))
+                                            ]),
+                                        onPressed: () async {
+                                          _formKey.currentState.save();
 
-                                        if (_formKey.currentState.validate()) {
-                                          FocusScope.of(context).unfocus();
+                                          if (_formKey.currentState
+                                              .validate()) {
+                                            FocusScope.of(context).unfocus();
 
-                                          if (userPfpPath != null) {
-                                            setState(
-                                                () => {showMessage = true});
-                                            setState(() => {indicator = true});
-                                            setState(() =>
-                                                {message = "Saving profile"});
-                                            final File userPfp =
-                                                File(userPfpPath);
-                                            firebase_storage.UploadTask
-                                                userPfpUploadTask = _storage
+                                            if (userPfpPath != null) {
+                                              setState(
+                                                  () => {showMessage = true});
+                                              setState(
+                                                  () => {indicator = true});
+                                              setState(() =>
+                                                  {message = "Saving profile"});
+                                              final File userPfp =
+                                                  File(userPfpPath);
+                                              firebase_storage.UploadTask
+                                                  userPfpUploadTask = _storage
+                                                      .ref(
+                                                          '$userEmail/pfp/${basename(userPfpPath)}')
+                                                      .putFile(userPfp);
+
+                                              try {
+                                                firebase_storage.TaskSnapshot
+                                                    snapshot =
+                                                    await userPfpUploadTask;
+                                                // get download url of uploaded image
+                                                userPfpUrl = await _storage
                                                     .ref(
                                                         '$userEmail/pfp/${basename(userPfpPath)}')
-                                                    .putFile(userPfp);
-
-                                            try {
-                                              firebase_storage.TaskSnapshot
-                                                  snapshot =
-                                                  await userPfpUploadTask;
-                                              // get download url of uploaded image
-                                              userPfpUrl = await _storage
-                                                  .ref(
-                                                      '$userEmail/pfp/${basename(userPfpPath)}')
-                                                  .getDownloadURL();
-                                              print('uploaded picture.');
-                                              print(userPfpUrl);
-                                            } catch (e) {
-                                              print(userPfpUploadTask.snapshot);
+                                                    .getDownloadURL();
+                                                print('uploaded picture.');
+                                                print(userPfpUrl);
+                                              } catch (e) {
+                                                print(
+                                                    userPfpUploadTask.snapshot);
+                                              }
+                                              // update firebase auth user object
+                                              final user = _auth.currentUser;
+                                              await user.updateProfile(
+                                                  displayName:
+                                                      '${user.displayName}',
+                                                  photoURL: userPfpUrl);
                                             }
-                                            // update firebase auth user object
-                                            final user = _auth.currentUser;
-                                            await user.updateProfile(
-                                                displayName:
-                                                    '${user.displayName}',
-                                                photoURL: userPfpUrl);
-                                          }
 
-                                          // update user details in db
-                                          final http.Response response =
-                                              await http.post(
-                                            'https://kyt-api.azurewebsites.net/update/profile',
-                                            headers: <String, String>{
-                                              'Content-Type':
-                                                  'application/json; charset=UTF-8'
-                                            },
-                                            body: jsonEncode(<String, String>{
-                                              'authToken': '${user.uid}',
-                                              'phoneNumber': phoneNumber,
-                                              'pfpUrl': userPfpUrl
-                                            }),
-                                          );
+                                            // update user details in db
+                                            final http.Response response =
+                                                await http.post(
+                                              'https://kyt-api.azurewebsites.net/update/profile',
+                                              headers: <String, String>{
+                                                'Content-Type':
+                                                    'application/json; charset=UTF-8'
+                                              },
+                                              body: jsonEncode(<String, String>{
+                                                'authToken': '${user.uid}',
+                                                'phoneNumber': phoneNumber,
+                                                'pfpUrl': userPfpUrl
+                                              }),
+                                            );
 
-                                          if (response.statusCode == 200) {
-                                            if (response.body ==
-                                                "invalid picture") {
-                                              setState(
-                                                  () => {indicator = false});
-                                              setState(
-                                                  () => {showMessage = false});
-                                              var snackBar = SnackBar(
-                                                  content: Text(
-                                                      'Please upload a picture of yourself.'));
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(snackBar);
-                                            } else {
-                                              setState(
-                                                  () => {indicator = false});
-                                              setState(() => {
-                                                    message =
-                                                        "Profile updated successfully"
-                                                  });
+                                            if (response.statusCode == 200) {
+                                              if (response.body ==
+                                                  "invalid picture") {
+                                                setState(
+                                                    () => {indicator = false});
+                                                setState(() =>
+                                                    {showMessage = false});
+                                                var snackBar = SnackBar(
+                                                    content: Text(
+                                                        'Please upload a picture of yourself.'));
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(snackBar);
+                                              } else {
+                                                setState(
+                                                    () => {indicator = false});
+                                                setState(() => {
+                                                      message =
+                                                          "Profile updated successfully"
+                                                    });
+                                              }
                                             }
                                           }
-                                        }
-                                      },
-                                    ),
-                                    Container(
-                                        height: 110,
-                                        width: double.infinity,
-                                        color: MyColors.offWhite,
-                                        child: Center(
-                                            child: Container(
-                                                padding: EdgeInsets.all(16),
-                                                color: MyColors.offWhite,
-                                                child: Column(children: [
-                                                  showMessage
-                                                      ? Column(children: [
-                                                          indicator
-                                                              ? CircularProgressIndicator()
-                                                              : MySpaces
-                                                                  .vSmallGapInBetween,
-                                                          MySpaces
-                                                              .vSmallGapInBetween,
-                                                          Text(message)
-                                                        ])
-                                                      : SizedBox(width: 0.0)
-                                                ]))))
-                                  ],
-                                )))
-                      ],
-                    ),
-                  )))),
+                                        },
+                                      ),
+                                      Container(
+                                          height: 110,
+                                          width: double.infinity,
+                                          color: MyColors.offWhite,
+                                          child: Center(
+                                              child: Container(
+                                                  padding: EdgeInsets.all(16),
+                                                  color: MyColors.offWhite,
+                                                  child: Column(children: [
+                                                    showMessage
+                                                        ? Column(children: [
+                                                            indicator
+                                                                ? CircularProgressIndicator()
+                                                                : MySpaces
+                                                                    .vSmallGapInBetween,
+                                                            MySpaces
+                                                                .vSmallGapInBetween,
+                                                            Text(message)
+                                                          ])
+                                                        : SizedBox(width: 0.0)
+                                                  ]))))
+                                    ],
+                                  )))
+                        ],
+                      ),
+                    ))),
+              )),
         ));
   }
 }

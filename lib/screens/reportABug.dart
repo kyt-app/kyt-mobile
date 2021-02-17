@@ -25,11 +25,14 @@ class _ReportABugState extends State<ReportABug> {
                   .headline6
                   .copyWith(color: MyColors.white)),
         ),
-        body: InAppWebView(
-          initialUrl: url,
-          onWebViewCreated: (InAppWebViewController controller) {
-            _webViewController = controller;
-          },
+        body: Semantics(
+          label: "Report a bug",
+          child: InAppWebView(
+            initialUrl: url,
+            onWebViewCreated: (InAppWebViewController controller) {
+              _webViewController = controller;
+            },
+          ),
         ));
   }
 }
