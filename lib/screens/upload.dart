@@ -173,8 +173,10 @@ class _UploadState extends State<Upload> {
                       String ocrText = '';
 
                       Timer(Duration(seconds: 2), () async {
-                        ocrText =
+                        List<dynamic> ocrResponse =
                             await getTextFromOCR(resultsEndpoint, context);
+                        String ocrText = ocrResponse[0];
+                        DateTime testDate = ocrResponse[1];
 
                         print('ocr was completed');
 
@@ -183,8 +185,8 @@ class _UploadState extends State<Upload> {
                         });
 
                         // push data to db and validate test result
-                        validTest = await validateAndUploadData(
-                            ocrText, user.uid, testName, testImageUrl);
+                        validTest = await validateAndUploadData(ocrText,
+                            user.uid, testName, testImageUrl, testDate);
 
                         print('camera intent valid test result: $validTest');
                         setState(() {
@@ -281,7 +283,10 @@ class _UploadState extends State<Upload> {
                     String ocrText = '';
 
                     Timer(Duration(seconds: 2), () async {
-                      ocrText = await getTextFromOCR(resultsEndpoint, context);
+                      List<dynamic> ocrResponse =
+                          await getTextFromOCR(resultsEndpoint, context);
+                      String ocrText = ocrResponse[0];
+                      DateTime testDate = ocrResponse[1];
 
                       print('ocr was completed');
 
@@ -291,7 +296,7 @@ class _UploadState extends State<Upload> {
 
                       // push data to db and validate test result
                       validTest = await validateAndUploadData(
-                          ocrText, user.uid, testName, testImageUrl);
+                          ocrText, user.uid, testName, testImageUrl, testDate);
 
                       print('camera intent valid test result: $validTest');
                       setState(() {
@@ -401,7 +406,10 @@ class _UploadState extends State<Upload> {
                     String ocrText = '';
 
                     Timer(Duration(seconds: 2), () async {
-                      ocrText = await getTextFromOCR(resultsEndpoint, context);
+                      List<dynamic> ocrResponse =
+                          await getTextFromOCR(resultsEndpoint, context);
+                      String ocrText = ocrResponse[0];
+                      DateTime testDate = ocrResponse[1];
 
                       print('ocr was completed.');
 
@@ -411,7 +419,7 @@ class _UploadState extends State<Upload> {
 
                       // push data to db and validate test result
                       validTest = await validateAndUploadData(
-                          ocrText, user.uid, testName, testImageUrl);
+                          ocrText, user.uid, testName, testImageUrl, testDate);
 
                       print('gallery intent valid test result: $validTest');
                       setState(() {
@@ -506,7 +514,10 @@ class _UploadState extends State<Upload> {
                   String ocrText = '';
 
                   Timer(Duration(seconds: 2), () async {
-                    ocrText = await getTextFromOCR(resultsEndpoint, context);
+                    List<dynamic> ocrResponse =
+                        await getTextFromOCR(resultsEndpoint, context);
+                    String ocrText = ocrResponse[0];
+                    DateTime testDate = ocrResponse[1];
 
                     print('ocr was completed.');
 
@@ -516,7 +527,7 @@ class _UploadState extends State<Upload> {
 
                     // push data to db and validate test result
                     validTest = await validateAndUploadData(
-                        ocrText, user.uid, testName, testImageUrl);
+                        ocrText, user.uid, testName, testImageUrl, testDate);
 
                     print('gallery intent valid test result: $validTest');
                     setState(() {
