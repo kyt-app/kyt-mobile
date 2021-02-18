@@ -73,11 +73,15 @@ DateTime getDateFromText(String ocrText) {
   DateTime dateTime;
 
   if (ocrText.indexOf(months) < 0) {
-    // match mm/dd/yyyy or dd/mm/yyyy
-    date = ocrText.substring(ocrText.indexOf(altDate), ocrText.indexOf(altDate) + 10);
-    List<String> dateList = date.split("/");
-    dateTime = DateTime.utc(int.parse(dateList.last), int.parse(dateList[1]), int.parse(dateList[0]), 15, 00, 00);
-    return dateTime;
+    if (ocrText.indexOf(altDate) < 0) {
+      // use current date if no date found
+      dateTime = DateTime.now();
+    } else {
+      // match mm/dd/yyyy or dd/mm/yyyy
+      date = ocrText.substring(ocrText.indexOf(altDate), ocrText.indexOf(altDate) + 10);
+      List<String> dateList = date.split("/");
+      dateTime = DateTime.utc(int.parse(dateList.last), int.parse(dateList[1]), int.parse(dateList[0]), 15, 00, 00);
+    }
   } else {
     // get text around month name
     String rawDateArea = ocrText.substring(ocrText.indexOf(months) - 30, ocrText.indexOf(months)) + ocrText.substring(ocrText.indexOf(months), ocrText.indexOf(months) + 30);
@@ -88,6 +92,7 @@ DateTime getDateFromText(String ocrText) {
     List<String> dateList = date.split(" ");
     // convert customized date string to datetime object
     dateTime = DateTime.utc(int.parse(dateList.last), monthsMap[dateList[1]], int.parse(dateList[0]), 15, 00, 00);
-    return dateTime;
   }
+
+  return dateTime;
 }
