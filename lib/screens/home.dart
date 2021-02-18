@@ -52,49 +52,52 @@ class _HomeState extends State<Home> {
             resizeToAvoidBottomInset: false,
             backgroundColor: MyColors.offWhite,
             body: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  UserPictureAndName(user: user),
-                  Container(
-                      child: Container(
-                    margin: EdgeInsets.all(MyDimens.double_30),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            child: Text(
-                              'Health care records'.toUpperCase(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1
-                                  .copyWith(
-                                      color: MyColors.darkPrimary,
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 14),
+              child: Semantics(
+                label: "Home screen",
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    UserPictureAndName(user: user),
+                    Container(
+                        child: Container(
+                      margin: EdgeInsets.all(MyDimens.double_30),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              child: Text(
+                                'Health care records'.toUpperCase(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle1
+                                    .copyWith(
+                                        color: MyColors.darkPrimary,
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 8),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                          ),
-                          MySpaces.vGapInBetween,
-                          Container(
-                            height: 350.0,
-                            child: ListView.builder(
-                              padding: EdgeInsets.all(0.0),
-                              shrinkWrap: true,
-                              itemCount: userProfile['tests'].length,
-                              itemBuilder: (context, index) {
-                                final test = userProfile['tests'][index];
-                                return TestCard(
-                                    iconBool: test['status'] == 'valid'
-                                        ? true
-                                        : false,
-                                    text: test['testName']);
-                              },
+                            MySpaces.vGapInBetween,
+                            Container(
+                              height: 350.0,
+                              child: ListView.builder(
+                                padding: EdgeInsets.all(0.0),
+                                shrinkWrap: true,
+                                itemCount: userProfile['tests'].length,
+                                itemBuilder: (context, index) {
+                                  final test = userProfile['tests'][index];
+                                  return TestCard(
+                                      iconBool: test['status'] == 'valid'
+                                          ? true
+                                          : false,
+                                      text: test['testName']);
+                                },
+                              ),
                             ),
-                          ),
-                        ]),
-                  )),
-                ],
+                          ]),
+                    )),
+                  ],
+                ),
               ),
             ),
           );
