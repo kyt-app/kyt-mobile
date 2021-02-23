@@ -86,11 +86,14 @@ class _HomeState extends State<Home> {
                                 itemCount: userProfile['tests'].length,
                                 itemBuilder: (context, index) {
                                   final test = userProfile['tests'][index];
-                                  return TestCard(
-                                      iconBool: test['status'] == 'valid'
-                                          ? true
-                                          : false,
-                                      text: test['testName']);
+                                  // render TestCard if it is not archived
+                                  return test['archived']
+                                      ? SizedBox(width: 0.0)
+                                      : TestCard(
+                                          iconBool: test['status'] == 'valid'
+                                              ? true
+                                              : false,
+                                          text: test['testName']);
                                 },
                               ),
                             ),

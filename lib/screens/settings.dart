@@ -56,6 +56,15 @@ class _SettingsState extends State<Settings> {
             ),
             MySpaces.vGapInBetween,
             SettingsRow(
+              icon: Icons.archive,
+              label: 'Archived reports',
+              onPressed: () {
+                Navigator.of(context).push(
+                    // TODO: create screen named ArchivedReports()
+                    MaterialPageRoute(builder: (context) => ReportABug()));
+              },
+            ),
+            SettingsRow(
               icon: Icons.edit,
               label: 'Edit Profile',
               onPressed: () {
