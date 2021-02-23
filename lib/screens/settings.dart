@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:kyt/functions/showSignoutConfirmation.dart';
 import 'package:kyt/global/myColors.dart';
 import 'package:kyt/global/mySpaces.dart';
+import 'package:kyt/screens/archivedRecords.dart';
 import 'package:kyt/screens/editProfile.dart';
 import 'package:kyt/screens/reportABug.dart';
 import 'package:kyt/widgets/settingsRow.dart';
@@ -47,7 +48,7 @@ class _SettingsState extends State<Settings> {
             Padding(
               padding: EdgeInsets.only(left: 38.0),
               child: Text(
-                'Settings'.toUpperCase(),
+                'Menu'.toUpperCase(),
                 style: Theme.of(context).textTheme.subtitle1.copyWith(
                     color: MyColors.darkPrimary,
                     fontWeight: FontWeight.normal,
@@ -60,13 +61,12 @@ class _SettingsState extends State<Settings> {
               label: 'Archived reports',
               onPressed: () {
                 Navigator.of(context).push(
-                    // TODO: create screen named ArchivedReports()
-                    MaterialPageRoute(builder: (context) => ReportABug()));
+                    MaterialPageRoute(builder: (context) => ArchivedRecords()));
               },
             ),
             SettingsRow(
               icon: Icons.edit,
-              label: 'Edit Profile',
+              label: 'Edit profile',
               onPressed: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => EditProfile()));

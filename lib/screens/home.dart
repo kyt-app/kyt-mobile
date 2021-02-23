@@ -49,7 +49,6 @@ class _HomeState extends State<Home> {
           final userProfile = json.decode(snapshot.data);
 
           return Scaffold(
-            resizeToAvoidBottomInset: false,
             backgroundColor: MyColors.offWhite,
             body: Container(
               child: Semantics(
@@ -66,7 +65,7 @@ class _HomeState extends State<Home> {
                           children: <Widget>[
                             Padding(
                               child: Text(
-                                'Health care records'.toUpperCase(),
+                                'Healthcare records'.toUpperCase(),
                                 style: Theme.of(context)
                                     .textTheme
                                     .subtitle1

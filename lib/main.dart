@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kyt/screens/archivedRecords.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/register.dart';
@@ -37,6 +38,7 @@ class Kyt extends StatelessWidget {
               Welcome.id: (context) => Welcome(),
               Navigation.id: (context) => Navigation(),
               TestDetails.id: (context) => TestDetails(),
+              ArchivedRecords.id: (context) => ArchivedRecords()
             },
           );
         }

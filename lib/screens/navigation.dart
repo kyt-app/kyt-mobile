@@ -71,7 +71,7 @@ class _NavigationState extends State<Navigation> {
                       },
                       padding: EdgeInsets.only(right: MyDimens.double_60)),
                   IconButton(
-                      icon: Icon(Icons.settings,
+                      icon: Icon(Icons.menu,
                           color: _iconColors[thirdIconColorInt]),
                       onPressed: () {
                         setState(() {
